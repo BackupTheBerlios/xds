@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /**
-    Trida reprezentuje adresar souboroveho systemu
+ * Trida reprezentuje adresar souboroveho systemu
  */
 public class Directory extends FileSystemItem implements Browseable {
     private Vector children;
@@ -22,8 +22,7 @@ public class Directory extends FileSystemItem implements Browseable {
     public FileSystemItem addChild(FileSystemItem child) throws FileSystemException {
         if (!children.contains(child)) {
             children.add(child);
-        }
-        else
+        } else
             throw new ItemCreationException("Item with same name already exists");
 
         return child;
@@ -35,7 +34,7 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     public Directory createSubDir(String name, Attributes attributes) throws FileSystemException {
-        return (Directory)addChild(new Directory(name, this, attributes));
+        return (Directory) addChild(new Directory(name, this, attributes));
     }
 
     public Iterator getIterator() {
@@ -55,11 +54,11 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     public File createNewFile(String name, String type, Attributes attributes, byte[] data) throws FileSystemException {
-        return (File)addChild(new File(name, type, attributes, this, data));
+        return (File) addChild(new File(name, type, attributes, this, data));
     }
 
     public Link createLink(String name) throws FileSystemException {
-        Link newLink = (Link)getParent().addChild(new Link(this, name));
+        Link newLink = (Link) getParent().addChild(new Link(this, name));
         addLink(newLink);
 
         return newLink;
@@ -67,15 +66,13 @@ public class Directory extends FileSystemItem implements Browseable {
 
     public void delete() throws FileSystemException {
         if (links.size() == 0) {
-            Iterator i = getIterator();
-            while (i.hasNext()) {
-                FileSystemItem fsi = (FileSystemItem)i.next();
+            while (children.size() > 0) {
+                FileSystemItem fsi = (FileSystemItem) children.firstElement();
                 fsi.delete();
             }
         }
-
         children = null;
-        
+
         super.delete();
     }
 
