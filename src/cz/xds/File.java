@@ -1,7 +1,7 @@
 package cz.xds;
 
 /**
-    Soubor souboroveho systemu
+ * Soubor souboroveho systemu
  */
 public class File extends FileSystemItem {
     protected String type;
@@ -17,13 +17,12 @@ public class File extends FileSystemItem {
     }
 
     public Link createLink(String name) throws FileSystemException {
-        return addLink((Link)getParent().addChild(new Link(this, name)));
+        return addLink((Link) getParent().addChild(new Link(this, name)));
     }
 
     public void delete() throws FileSystemException {
-        data = null;
-
         super.delete();
+        data = null;
     }
 
     public void copy(Directory d) throws FileSystemException {
