@@ -13,4 +13,9 @@ public class mkdir implements Command {
     public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
         fs.getCurrentDirectory().createSubDir((String)param[1]);
     }
+
+    public String help(boolean briefOnly) {
+        return new String("mkdir dir");
+        //TODO: kompletni napoveda
+    }
 }

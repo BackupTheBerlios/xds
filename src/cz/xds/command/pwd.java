@@ -16,4 +16,9 @@ public class pwd implements Command {
 	public void execute(FileSystem fs, PrintStream outStream, Object[] param) {
         outStream.println(fs.getCurrentDirectory().getFullPath());
     }
+
+    public String help(boolean briefOnly) {
+        return new String("pwd");
+        //TODO: kompletni napoveda
+    }
 }

@@ -15,7 +15,7 @@ import java.util.Iterator;
 public class chmod implements Command {
     public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
         if (param.length != 3)
-            throw new FileSystemException("Invalid usage of 'chmod'. Use: chmod file [r|h]");
+            throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
 
         String name = (String)param[1];
         Iterator it = fs.getCurrentDirectory().getIterator();
@@ -29,5 +29,10 @@ public class chmod implements Command {
             }
         }
         throw new FileSystemException("Item not found");
+    }
+
+    public String help(boolean briefOnly) {
+        return new String("chmod file [r|h]");
+        //TODO: kompletni napoveda
     }
 }

@@ -31,4 +31,10 @@ public class link implements Command {
         //fs.getCurrentDirectory().createLink(new Path(String)param[1]);
     }
 
+    public String help(boolean briefOnly) {
+        return new String("link");
+        //TODO: kompletni napoveda
+    }
+
+
 }

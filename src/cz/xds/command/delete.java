@@ -25,4 +25,9 @@ public class delete implements Command {
         }
         throw new FileSystemException("Item not found");
     }
+
+    public String help(boolean briefOnly) {
+        return new String("delete");
+        //TODO: kompletni napoveda
+    }
 }

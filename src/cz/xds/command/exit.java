@@ -15,4 +15,9 @@ public class exit implements Command {
 
         throw new FileSystemException("exit");
     }
+
+    public String help(boolean briefOnly) {
+        return new String("exit");
+        //TODO: kompletni napoveda
+    }
 }

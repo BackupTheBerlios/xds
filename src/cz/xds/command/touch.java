@@ -19,4 +19,9 @@ public class touch implements Command {
 
         fs.getCurrentDirectory().createNewFile(param1, param2);
     }
+
+    public String help(boolean briefOnly) {
+        return new String("touch filename filetype");
+        //TODO: kompletni napoveda
+    }
 }

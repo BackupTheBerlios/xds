@@ -21,4 +21,9 @@ public class dir implements Command {
                 outStream.println(i);
         }
     }
+
+    public String help(boolean briefOnly) {
+        return new String("dir");
+        //TODO: kompletni napoveda
+    }
 }

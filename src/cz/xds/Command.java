@@ -6,5 +6,7 @@ import java.io.*;
  * @author vsch
  */
 public interface Command {
-      public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException;
+    public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException;
+
+    public String help(boolean briefOnly);
 }

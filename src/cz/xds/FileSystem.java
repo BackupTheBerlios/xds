@@ -55,6 +55,7 @@ public class FileSystem {
 
     private InvocationHandler handler = new InvocationHandler() {
        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+           int paramCount = ((Object[])args[2]).length;
            String command = "cz.xds.command."+((Object[])args[2])[0];
            Class classExecute;
            try {
@@ -62,9 +63,31 @@ public class FileSystem {
            } catch (ClassNotFoundException e) {
                throw new FileSystemException ("Command not found");
            }
-           Method methodExecute = classExecute.getMethod("execute", new Class[] { FileSystem.class, PrintStream.class, Object[].class } );
+
+           Method methodExecute = null;
+           boolean helpNeeded = false;
+
+           if (paramCount > 1) {
+               String secondParam = (String)(((Object[])args[2])[1]);
+
+               if (secondParam.equals("/?") || secondParam.equals("--help")) {
+                   //TODO: rozlisit normalni a 'verbose' help, pripadne dodat obdobu 'man'... ale to je uz asi moc ;-)
+                   methodExecute = classExecute.getMethod("help", new Class[] { boolean.class } );
+                   helpNeeded = true;
+               }
+           }
+
+           if (methodExecute == null)
+               methodExecute = classExecute.getMethod("execute", new Class[] { FileSystem.class, PrintStream.class, Object[].class } );
+
            Object executeObject = classExecute.newInstance();
-           methodExecute.invoke(executeObject, args);
+
+           if (helpNeeded) {
+               // TODO: nechci v tedle metode nic vypisovat - ale vyjimka neni dobre reseni..
+               throw new FileSystemException((String)methodExecute.invoke(executeObject, new Object[] { new Boolean(true) } ));
+           }
+           else
+               methodExecute.invoke(executeObject, args);
            return null;
        }
     };

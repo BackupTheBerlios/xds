@@ -48,4 +48,12 @@ public class cd implements Command {
 
         fs.changeDirectory(workDir);
     }
+
+    public String help(boolean briefOnly) {
+        if (briefOnly)
+            return new String("cd [dir]");
+
+        return new String("cd - Change current Directory\nUsage: cd [dir]\n\tdir - new directory. If not given, the current " +
+                "directory is printed out");
+    }
 }
