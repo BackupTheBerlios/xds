@@ -7,7 +7,7 @@ package cz.xds;
 public class TestClass {
     public static void main(String[] args) {
         try {
-            String name = "c:\\command.zip";
+            String name = "classes\\command.zip";
             if (args.length > 1) {
                 name = args[1];
             }
