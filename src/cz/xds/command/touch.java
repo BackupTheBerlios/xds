@@ -11,7 +11,7 @@ import java.io.PrintStream;
  */
 public class touch implements Command {
     public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
-         if (param.length != 2)
+         if (param.length != 3)
              throw new FileSystemException("Bad arguments for command touch.\nUsage: touch filename filetype");
 
          String param1 = (String)param[1];

@@ -16,13 +16,15 @@ public class File extends FileSystemItem {
         this.data = data;
     }
 
-    public FileSystemItem createLink(Path path) {
-        return null;
+    public Link createLink(String name) throws FileSystemException {
+        return addLink((Link)getParent().addChild(new Link(this, name)));
     }
 
     public void delete() throws FileSystemException {
         parent.delete(this);
         data = null;
+        
+        removeLinks();
     }
 
     public void copy(Directory d) throws FileSystemException {

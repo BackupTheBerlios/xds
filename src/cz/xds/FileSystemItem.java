@@ -1,5 +1,7 @@
 package cz.xds;
 
+import java.util.Vector;
+
 /**
  * Zakladni trida reprezentujici obecnou polozku souboroveho systemu.
  */
@@ -8,6 +10,7 @@ public abstract class FileSystemItem {
     protected Attributes attributes;
     protected long id;
     protected Directory parent;
+    protected Vector links = new Vector();
 
     public String getName() {
         return name;
@@ -29,7 +32,26 @@ public abstract class FileSystemItem {
         return new Path(this);
     }
 
-    public abstract FileSystemItem createLink(Path path) throws FileSystemException;
+    public Link addLink(Link newLink) {
+        links.add(newLink);
+
+        return newLink;
+    }
+
+    protected void removeLinks() throws FileSystemException {
+        // musi byt links.size() - pocet se zjistuje v kazdem loopu!
+        for (int x=0; x<links.size(); x++) {
+            Link i = (Link)links.get(x);
+
+            links.remove(x);
+
+            i.getParent().delete(i);
+            System.out.println("Link " + i.getName() + " deleted!");
+            x--;
+        }
+    }
+
+    public abstract Link createLink(String name) throws FileSystemException;
 
     public abstract void delete() throws FileSystemException;
 
@@ -39,7 +61,15 @@ public abstract class FileSystemItem {
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(id).append(" - ").append(name);
+
+        sb.append((this instanceof Link) ? "*" : ((this instanceof Directory) ? "D" : " "));
+        sb.append(" ").append(name).append(" (").append(id).append(")");
+
+        if (this instanceof Link) {
+            FileSystemItem target = ((Link)this).getTarget();
+            sb.append("  -> ").append(target.getFullPath()).append(!(target instanceof Directory) ? target.getName() : "");
+        }
+
         return sb.toString();
     }
 

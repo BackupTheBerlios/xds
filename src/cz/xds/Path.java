@@ -14,9 +14,10 @@ public class Path {
         path = new Vector();
 
         FileSystemItem akt = fsi;
-        if (fsi instanceof Directory) {
+
+        if (fsi instanceof Directory)
             path.add(fsi);
-        }
+
         while ((akt = akt.getParent()) != null) {
             path.add(akt);
         }
@@ -31,7 +32,11 @@ public class Path {
         int size = path.size();
         for (int i = (size-1); i >= 0; i--) {
             Directory d = (Directory)path.elementAt(i);
-            sb.append(d.getName()).append(PATH_SEPARATOR);
+
+            sb.append(d.getName());
+
+            if (i!= size - 1)
+                sb.append(PATH_SEPARATOR);
         }
         return sb.toString();
     }

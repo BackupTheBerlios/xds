@@ -7,7 +7,8 @@ import java.util.Vector;
     Trida reprezentuje adresar souboroveho systemu
  */
 public class Directory extends FileSystemItem implements Browseable {
-    private Vector references;
+    private Vector children;
+    private boolean deleting;
 
     protected Directory(String name, Directory parent, Attributes attributes) {
         this.name = name;
@@ -15,7 +16,17 @@ public class Directory extends FileSystemItem implements Browseable {
         this.parent = parent;
         this.attributes = attributes;
 
-        references = new Vector();
+        children = new Vector();
+    }
+
+    public FileSystemItem addChild(FileSystemItem child) throws FileSystemException {
+        if (!children.contains(child)) {
+            children.add(child);
+        }
+        else
+            throw new ItemCreationException("Item with same name already exists");
+
+        return child;
     }
 
     public Directory createSubDir(String name) throws FileSystemException {
@@ -23,16 +34,12 @@ public class Directory extends FileSystemItem implements Browseable {
         return createSubDir(name, at);
     }
 
-    public Directory createSubDir(String name, Attributes attributes)  throws FileSystemException {
-        Directory newDir = new Directory(name, this, attributes);
-        if (!references.contains(newDir)) {
-            references.add(newDir);
-        } else throw new ItemCreationException("Item with same name already exists");
-        return newDir;
+    public Directory createSubDir(String name, Attributes attributes) throws FileSystemException {
+        return (Directory)addChild(new Directory(name, this, attributes));
     }
 
     public Iterator getIterator() {
-        return references.iterator();
+        return children.iterator();
     }
 
     public File createNewFile(String name, String type) throws FileSystemException {
@@ -48,29 +55,38 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     public File createNewFile(String name, String type, Attributes attributes, byte[] data) throws FileSystemException {
-        File newFile = new File(name, type, attributes, this, data);
-        if (!references.contains(newFile)) {
-            references.add(newFile);
-        } else throw new ItemCreationException("Item with same name already exists");
-        return newFile;
+        return (File)addChild(new File(name, type, attributes, this, data));
     }
 
-    public FileSystemItem createLink(Path path) throws FileSystemException {
-        return null;
+    public Link createLink(String name) throws FileSystemException {
+        Link newLink = (Link)getParent().addChild(new Link(this, name));
+        addLink(newLink);
+
+        return newLink;
     }
 
     public void delete() throws FileSystemException {
-        Iterator i = getIterator();
-        while (i.hasNext()) {
-            FileSystemItem fsi = (FileSystemItem)i.next();
-            fsi.delete();
+        if (links.size() == 0) {
+            Iterator i = getIterator();
+            while (i.hasNext()) {
+                FileSystemItem fsi = (FileSystemItem)i.next();
+                fsi.delete();
+            }
         }
+        else
+            removeLinks();
+
         parent.delete(this);
-        references = null;
+
+        children = null;
+        links = null;
     }
 
     public void delete(FileSystemItem fsi) throws FileSystemException {
-        references.remove(fsi);
+        //if (attributes.isReadOnly())
+        //    throw new FileSystemException("Protected");
+
+        children.remove(fsi);
     }
 
     public void copy(Directory d) throws FileSystemException {

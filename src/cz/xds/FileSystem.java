@@ -21,7 +21,7 @@ public class FileSystem {
 
     public static FileSystem createFileSystem() {
         Attributes at = new Attributes (false, false);
-        Directory d = new Directory("", null, at);
+        Directory d = new Directory("/", null, at);
         FileSystem fs = new FileSystem(d);
         return fs;
     }
