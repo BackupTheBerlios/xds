@@ -44,7 +44,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @return Vraci vlozenou polozku
      * @throws FileSystemException Vola se v pripade, ze polozka jiz existuje
      */
-    public FileSystemItem addChild(FileSystemItem child) throws FileSystemException {
+    protected FileSystemItem addChild(FileSystemItem child) throws FileSystemException {
         if (!children.contains(child)) {
             children.add(child);
         } else
