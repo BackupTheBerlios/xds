@@ -13,18 +13,17 @@ public class move implements Command {
             throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
         }
 
-        String name = (String) param[1];
-        Directory dir = fs.getCurrentDirectory();
-        Directory destDir = fs.getCurrentDirectory();
+        Path sourcePath = new Path((String) param[1], false), destPath = new Path((String) param[2], true);
+        Directory srcDir = sourcePath.getDirectory(fs);
+        Directory destDir = destPath.getDirectory(fs);
 
-        int index = name.lastIndexOf(Path.PATH_SEPARATOR);
-        if (index != -1) {
-            dir = Path.parseDirectory(fs, name.substring(0, index + 1));
-            name = name.substring(index + 1);
-        }
+        FileSystemItem toMove = srcDir.findItem(sourcePath.getItemName());
 
-        destDir = Path.parseDirectory(fs, (String) param[2]);
-        FileSystemItem toMove = dir.findItem(name);
+        Directory testDir = destDir;
+        while ((testDir = testDir.getParent()) != null)
+            if (testDir == srcDir)
+                throw new FileSystemException("Invalid move attempt");
+
         toMove.move(destDir);
     }
 

@@ -12,18 +12,10 @@ public class touch implements Command {
         if (param.length != 3)
             throw new FileSystemException("Bad arguments for command touch.\nUsage: touch filename filetype");
 
-        String param1 = (String) param[1];
-        Directory dir = fs.getCurrentDirectory();
+        Path p = new Path((String) param[1], false);
+        Directory dir = p.getDirectory(fs);
 
-        int index = param1.lastIndexOf(Path.PATH_SEPARATOR);
-
-        if (index != -1) {
-            dir = Path.parseDirectory(fs, param1.substring(0, index + 1));
-            param1 = param1.substring(index + 1);
-        }
-
-        String param2 = (String) param[2];
-        dir.createNewFile(param1, param2);
+        dir.createNewFile(p.getItemName(), (String) param[2]);
     }
 
     public String help(boolean briefOnly) {

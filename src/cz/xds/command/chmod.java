@@ -13,19 +13,12 @@ public class chmod implements Command {
         if (param.length != 3)
             throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
 
-        String name = (String) param[1];
-        Directory dir = fs.getCurrentDirectory();
-
-        int index = name.lastIndexOf(Path.PATH_SEPARATOR);
-
-        if (index != -1) {
-            dir = Path.parseDirectory(fs, name.substring(0, index + 1));
-            name = name.substring(index + 1);
-        }
+        Path p = new Path((String) param[1], false);
+        Directory dir = p.getDirectory(fs);
 
         Attributes attrSet = new Attributes((String) param[2]);
 
-        FileSystemItem fsi = dir.findItem(name);
+        FileSystemItem fsi = dir.findItem(p.getItemName());
         if (fsi != null)
             fsi.setAttributes(attrSet);
     }

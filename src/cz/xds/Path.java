@@ -8,10 +8,9 @@ import java.util.Vector;
  * Cesta v souborovem systemu
  */
 public class Path {
-    Vector path;
+    Vector path = null;
     public static final String PATH_SEPARATOR = "/";
-
-    //TODO: make a nice parser, wildcards/regexp checker etc.
+    String directory, itemName;
 
     public Path(FileSystemItem fsi) {
         path = new Vector();
@@ -26,8 +25,36 @@ public class Path {
         }
     }
 
+    public Path(String fullPath, boolean isOnlyDirectory) {
+        if (isOnlyDirectory)
+        {
+            directory = fullPath;
+            return;
+        }
+
+        int index = fullPath.lastIndexOf(PATH_SEPARATOR);
+
+        if (index != -1) {
+            directory = fullPath.substring(0, index + 1);
+            itemName = fullPath.substring(index + 1);
+        }
+        else
+            itemName = fullPath;
+    }
+
+    public String getDirectory() {
+        return directory;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
     public Vector getPath() {
         return path;
+    }
+
+    public Directory getDirectory(FileSystem fs) throws FileSystemException {
+        return directory == null ? fs.getCurrentDirectory() : parseDirectory(fs, directory);
     }
 
     public static Directory parseDirectory(FileSystem fs, String path) throws FileSystemException {
@@ -63,16 +90,20 @@ public class Path {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        int size = path.size();
-        for (int i = (size - 1); i >= 0; i--) {
-            Directory d = (Directory) path.elementAt(i);
+        if (path != null) {
+            StringBuffer sb = new StringBuffer();
+            int size = path.size();
+            for (int i = (size - 1); i >= 0; i--) {
+                Directory d = (Directory) path.elementAt(i);
 
-            sb.append(d.getName());
+                sb.append(d.getName());
 
-            if (i != size - 1)
-                sb.append(PATH_SEPARATOR);
+                if (i != size - 1)
+                    sb.append(PATH_SEPARATOR);
+            }
+            return sb.toString();
         }
-        return sb.toString();
+        else
+            return directory + itemName;
     }
 }

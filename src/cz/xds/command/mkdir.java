@@ -13,17 +13,10 @@ public class mkdir implements Command {
             throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
         }
 
-        String name = (String) param[1];
-        Directory dir = fs.getCurrentDirectory();
+        Path p = new Path((String) param[1], false);
+        Directory dir = p.getDirectory(fs);
 
-        int index = name.lastIndexOf(Path.PATH_SEPARATOR);
-
-        if (index != -1) {
-            dir = Path.parseDirectory(fs, name.substring(0, index + 1));
-            name = name.substring(index + 1);
-        }
-
-        dir.createSubDir(name);
+        dir.createSubDir(p.getItemName());
     }
 
     public String help(boolean briefOnly) {
