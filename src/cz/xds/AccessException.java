@@ -1,8 +1,7 @@
 package cz.xds;
 
 /**
- * Date: 13.12.2004
- * Time: 2:17:51
+ * Vyjimka znaci pokus o provedeni neplatne operace na polozce souboroveho systemu (napr. pokus o smazani polozky read-only.
  */
 public class AccessException extends FileSystemException {
     public AccessException(String s) {

@@ -13,41 +13,82 @@ public abstract class FileSystemItem implements Cloneable {
     protected Vector links = new Vector();
     protected IDFactory idFactory;
 
-    public FileSystemItem(IDFactory idFactory) {
+    protected FileSystemItem(IDFactory idFactory) {
         this.idFactory = idFactory;
         id = idFactory.createNewID(this);
     }
 
+    /**
+     * Vraci jmeno polozky
+     *
+     * @return Jmeno polozky
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Vraci atributy polozky
+     *
+     * @return Atributy polozky
+     */
     public Attributes getAttributes() {
         return attributes;
     }
 
+    /**
+     * Nastavuje atributy
+     *
+     * @param newAttr Nove atributy
+     */
     public void setAttributes(Attributes newAttr) {
         attributes = newAttr;
     }
 
+    /**
+     * Vraci ID polozky
+     *
+     * @return Id
+     */
     public long getId() {
         return id;
     }
 
+    /**
+     * Vraci rodice polozky
+     *
+     * @return Rodic
+     */
     public Directory getParent() {
         return parent;
     }
 
+    /**
+     * Vraci kompletni cestu k teto polozce (sled adresaru)
+     *
+     * @return Cesta k polozce
+     */
     public Path getFullPath() {
         return new Path(this);
     }
 
+    /**
+     * Pridava zaznam o novem odkazu na tuto polozku
+     *
+     * @param newLink Novy link
+     * @return
+     */
     public Link addLink(Link newLink) {
         links.add(newLink);
 
         return newLink;
     }
 
+    /**
+     * Odstrani vsechny odkazy na tuto plozku (v pripade jejiho smazani)
+     *
+     * @throws FileSystemException
+     */
     protected void removeLinks() throws FileSystemException {
         // musi byt links.size() - pocet se zjistuje v kazdem loopu!
         for (int x = 0; x < links.size(); x++) {
@@ -61,22 +102,41 @@ public abstract class FileSystemItem implements Cloneable {
         }
     }
 
+    /**
+     * Odstrani konkretni odkaz
+     *
+     * @param l
+     * @throws FileSystemException
+     */
     protected void removeLink(Link l) throws FileSystemException {
         links.remove(l);
     }
 
     protected abstract Object clone();
+
     public abstract Link createLink(Directory linkDir, String name) throws FileSystemException;
 
+    /**
+     * Kopiruje tuto polozku
+     *
+     * @param d Cilovy adresar
+     * @throws FileSystemException
+     */
     public void copy(Directory d) throws FileSystemException {
         if (this == d) throw new FileSystemException("Cant't move to itself");
         if (d.findItem(name) != null) throw new FileSystemException("Target file already exists");
 
-        FileSystemItem newItem = (FileSystemItem)clone();
+        FileSystemItem newItem = (FileSystemItem) clone();
         newItem.parent = d;
         d.addChild(newItem);
     }
 
+    /**
+     * Presouva polozku
+     *
+     * @param d Cilovy adresar
+     * @throws FileSystemException
+     */
     public void move(Directory d) throws FileSystemException {
         if (this == d) throw new FileSystemException("Cant't move to itself");
         if (d.findItem(name) != null) throw new FileSystemException("Target file already exists");
@@ -85,8 +145,13 @@ public abstract class FileSystemItem implements Cloneable {
         d.addChild(this);
     }
 
+    /**
+     * Smaze tuto polozku
+     *
+     * @throws FileSystemException V pripade, ze je polozka jen pro cteni
+     */
     public void delete() throws FileSystemException {
-        checkDeletable();
+        if (!isDeletable()) throw new AccessException(name);
 
         parent.delete(this);
 
@@ -96,9 +161,12 @@ public abstract class FileSystemItem implements Cloneable {
         idFactory.deleteID(id);
     }
 
-    public void checkDeletable() throws AccessException {
-        if (attributes.isReadOnly())
-            throw new AccessException(name);
+    /**
+     * Kontroluje, zda polozku lze smazat.
+     */
+    public boolean isDeletable() {
+        if (attributes.isReadOnly()) return false;
+        return true;
     }
 
     public String toString() {
