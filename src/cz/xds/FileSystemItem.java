@@ -7,7 +7,7 @@ import java.util.Vector;
  */
 public abstract class FileSystemItem {
     protected String name;
-    protected Attributes attributes = new Attributes();
+    protected Attributes attributes;
     protected long id;
     protected Directory parent;
     protected Vector links = new Vector();
@@ -67,8 +67,7 @@ public abstract class FileSystemItem {
 
         parent.delete(this);
 
-        if (!(this instanceof Link))
-            removeLinks();
+        removeLinks();
 
         links = null;
     }
