@@ -3,7 +3,6 @@ package cz.xds.command;
 import cz.xds.*;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 
 /**
  * Vymaze polozku
@@ -24,24 +23,19 @@ public class delete implements Command {
             name = name.substring(index + 1);
         }
 
-        Iterator it = dir.getIterator();
-
-        while (it.hasNext()) {
-            FileSystemItem fsi = (FileSystemItem) it.next();
-            if (fsi.getName().equals(name)) {
-
-                // Prece si nesmazu adresar ve ktere jsem :)
-                Directory tmp = fs.getCurrentDirectory().getParent();
-                if (fs.getCurrentDirectory() != fs.getRootDirectory()) {
-                    while (tmp != null) {
-                        if (tmp == dir) throw new FileSystemException("Can't delete actual directory");
-                        tmp = tmp.getParent();
-                    }
+        FileSystemItem target = dir.findItem(name);
+        if (target != null) {
+            // Prece si nesmazu adresar ve ktere jsem, ale asi by ten kod nemel byt tady... :)
+            Directory tmp = fs.getCurrentDirectory().getParent();
+            if (fs.getCurrentDirectory() != fs.getRootDirectory()) {
+                while (tmp != null) {
+                    if (tmp == dir) throw new FileSystemException("Can't delete actual directory");
+                    tmp = tmp.getParent();
                 }
-
-                fsi.delete();
-                return;
             }
+
+            target.delete();
+            return;
         }
         throw new FileSystemException("Item not found");
     }

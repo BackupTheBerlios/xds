@@ -29,12 +29,10 @@ public class link implements Command {
 
         Iterator it = dir.getIterator();
 
-        while (it.hasNext()) {
-            FileSystemItem fsi = (FileSystemItem) it.next();
-            if (fsi.getName().equals(linkTarget)) {
-                fsi.createLink(linkName);
-                return;
-            }
+        FileSystemItem target = dir.findItem(linkTarget);
+        if (target != null) {
+            target.createLink(linkName);
+            return;
         }
         throw new FileSystemException("Item not found");
 

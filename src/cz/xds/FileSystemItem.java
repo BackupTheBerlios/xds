@@ -7,7 +7,7 @@ import java.util.Vector;
  */
 public abstract class FileSystemItem {
     protected String name;
-    protected Attributes attributes;
+    protected Attributes attributes = new Attributes();
     protected long id;
     protected Directory parent;
     protected Vector links = new Vector();
@@ -44,8 +44,8 @@ public abstract class FileSystemItem {
 
     protected void removeLinks() throws FileSystemException {
         // musi byt links.size() - pocet se zjistuje v kazdem loopu!
-        for (int x=0; x<links.size(); x++) {
-            Link i = (Link)links.get(x);
+        for (int x = 0; x < links.size(); x++) {
+            Link i = (Link) links.get(x);
 
             links.remove(x);
 
@@ -59,7 +59,13 @@ public abstract class FileSystemItem {
 
     public abstract void copy(Directory d) throws FileSystemException;
 
-    public abstract void move(Directory d) throws FileSystemException;
+    public void move(Directory d) throws FileSystemException {
+        if (this == d) throw new FileSystemException("Cant't move to itself");
+        d.findItem(name);
+        parent.delete(this);
+        this.parent = d;
+        d.addChild(this);
+    }
 
     public void delete() throws FileSystemException {
         if (attributes.isReadOnly())
@@ -67,7 +73,8 @@ public abstract class FileSystemItem {
 
         parent.delete(this);
 
-        removeLinks();
+        if (!(this instanceof Link))
+            removeLinks();
 
         links = null;
     }
@@ -79,7 +86,7 @@ public abstract class FileSystemItem {
         sb.append(" ").append(attributes).append(" ").append(name).append(" (").append(id).append(")");
 
         if (this instanceof Link) {
-            FileSystemItem target = ((Link)this).getTarget();
+            FileSystemItem target = ((Link) this).getTarget();
             sb.append("  -> ").append(target.getFullPath()).append(!(target instanceof Directory) ? target.getName() : "");
         }
 
@@ -88,9 +95,12 @@ public abstract class FileSystemItem {
 
     public boolean equals(Object obj) {
         if (obj instanceof FileSystemItem) {
-            FileSystemItem d = (FileSystemItem)obj;
-            if ((d.parent == parent) && (d.getName().equals(name))) return true;
-            else return false;
-        } else return false;
+            FileSystemItem d = (FileSystemItem) obj;
+            if ((d.parent == parent) && (d.getName().equals(name)))
+                return true;
+            else
+                return false;
+        } else
+            return false;
     }
 }

@@ -29,10 +29,6 @@ public class File extends FileSystemItem {
 
     }
 
-    public void move(Directory d) throws FileSystemException {
-
-    }
-
     public String toString() {
         return super.toString();
     }

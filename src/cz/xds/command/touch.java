@@ -23,7 +23,6 @@ public class touch implements Command {
         }
 
         String param2 = (String) param[2];
-
         dir.createNewFile(param1, param2);
     }
 

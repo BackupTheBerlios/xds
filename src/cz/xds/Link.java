@@ -13,10 +13,12 @@ public class Link extends FileSystemItem {
         this.parent = target.parent;
     }
 
-    public FileSystemItem getTarget() { return target; }
+    public FileSystemItem getTarget() {
+        return target;
+    }
 
     public Link createLink(String linkName) throws FileSystemException {
-        throw new FileSystemException("cant' link to link");
+        throw new FileSystemException("Can't link to link");
     }
 
     public void delete() throws FileSystemException {
@@ -28,9 +30,4 @@ public class Link extends FileSystemItem {
     public void copy(Directory d) throws FileSystemException {
 
     }
-
-    public void move(Directory d) throws FileSystemException {
-
-    }
-
 }

@@ -75,6 +75,18 @@ public class Directory extends FileSystemItem implements Browseable {
         super.delete();
     }
 
+    public FileSystemItem findItem(String name) throws FileSystemException {
+        Iterator i = getIterator();
+        while (i.hasNext()) {
+            FileSystemItem fsi = (FileSystemItem) i.next();
+            if (fsi.getName().equals(name)) {
+                return fsi;
+            }
+        }
+
+        return null;
+    }
+
     public void delete(FileSystemItem fsi) throws FileSystemException {
         if (attributes.isReadOnly())
             throw new AccessException(name);
@@ -83,10 +95,6 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     public void copy(Directory d) throws FileSystemException {
-
-    }
-
-    public void move(Directory d) throws FileSystemException {
 
     }
 }
