@@ -61,7 +61,7 @@ public abstract class FileSystemItem {
 
     public void move(Directory d) throws FileSystemException {
         if (this == d) throw new FileSystemException("Cant't move to itself");
-        d.findItem(name);
+        if (d.findItem(name) != null) throw new FileSystemException("Target file already exists");
         parent.delete(this);
         this.parent = d;
         d.addChild(this);
