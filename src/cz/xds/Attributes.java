@@ -1,7 +1,7 @@
 package cz.xds;
 
 /**
-    Parametry polozky souboroveho systemu
+ * Parametry polozky souboroveho systemu
  */
 public class Attributes {
     private boolean isHidden;
@@ -9,9 +9,11 @@ public class Attributes {
 
     public Attributes() {
     }
+
     /**
-     * Zakladni konstruktor, hidden oznacuje skryty soubor, readOnly soubor jen pro cteni. 
-     * @param isHidden parametr hidden
+     * Zakladni konstruktor, hidden oznacuje skryty soubor, readOnly soubor jen pro cteni.
+     *
+     * @param isHidden   parametr hidden
      * @param isReadOnly parametr readOnly
      */
     public Attributes(boolean isHidden, boolean isReadOnly) {
@@ -22,10 +24,15 @@ public class Attributes {
     public Attributes(String attrString) {
         isReadOnly = attrString.toLowerCase().indexOf('r') != -1;
         isHidden = attrString.toLowerCase().indexOf('h') != -1;
+        if (attrString.indexOf('-') != -1) {
+            isReadOnly = false;
+            isHidden = false;
+        }
     }
 
     /**
      * Vraci bool hodnotu reprezentujici atribut "hidden"
+     *
      * @return parametr hidden
      */
     public boolean isHidden() {
@@ -34,6 +41,7 @@ public class Attributes {
 
     /**
      * Vraci bool hodnotu reprezentujici atribut "isReadOnly"
+     *
      * @return parametr isReadOnly
      */
     public boolean isReadOnly() {
@@ -42,6 +50,7 @@ public class Attributes {
 
     /**
      * Nastavuje parametr hidden
+     *
      * @param isHidden hodnota parametru hidden
      */
     public void setHidden(boolean isHidden) {
@@ -50,6 +59,7 @@ public class Attributes {
 
     /**
      * Nastavuje parametr readOnly
+     *
      * @param isReadOnly hodnota parametru readOnly
      */
     public void setReadOnly(boolean isReadOnly) {

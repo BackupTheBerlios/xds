@@ -8,7 +8,6 @@ import java.util.Vector;
  */
 public class Directory extends FileSystemItem implements Browseable {
     private Vector children;
-    private boolean deleting;
 
     protected Directory(String name, Directory parent, Attributes attributes) {
         this.name = name;

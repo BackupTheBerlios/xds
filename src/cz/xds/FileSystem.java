@@ -1,12 +1,17 @@
 package cz.xds;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.lang.reflect.*;
 
 /**
-    Rozhrani umoznujici vyvoreni souboroveho systemu a praci s nim
+ * Rozhrani umoznujici vyvoreni souboroveho systemu a praci s nim
  */
 public class FileSystem {
 
@@ -20,7 +25,7 @@ public class FileSystem {
     }
 
     public static FileSystem createFileSystem() {
-        Attributes at = new Attributes (false, false);
+        Attributes at = new Attributes(false, false);
         Directory d = new Directory(Path.PATH_SEPARATOR, null, at);
         FileSystem fs = new FileSystem(d);
         return fs;
@@ -54,52 +59,54 @@ public class FileSystem {
     private ClassLoader cl = new CommandClassLoader();
 
     private InvocationHandler handler = new InvocationHandler() {
-       public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-           int paramCount = ((Object[])args[2]).length;
-           String command = "cz.xds.command."+((Object[])args[2])[0];
-           Class classExecute;
-           try {
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            int paramCount = ((Object[]) args[2]).length;
+            String command = "cz.xds.command." + ((Object[]) args[2])[0];
+            Class classExecute;
+            try {
                 classExecute = cl.loadClass(command);
-           } catch (ClassNotFoundException e) {
-               throw new FileSystemException ("Command not found");
-           }
+            } catch (ClassNotFoundException e) {
+                throw new FileSystemException("Command not found");
+            }
 
-           Method methodExecute = null;
-           boolean helpNeeded = false;
+            Method methodExecute = null;
+            boolean helpNeeded = false, helpType = false;
 
-           if (paramCount > 1) {
-               String secondParam = (String)(((Object[])args[2])[1]);
+            if (paramCount > 1) {
+                String secondParam = (String) (((Object[]) args[2])[1]);
 
-               if (secondParam.equals("/?") || secondParam.equals("--help")) {
-                   //TODO: rozlisit normalni a 'verbose' help, pripadne dodat obdobu 'man'... ale to je uz asi moc ;-)
-                   methodExecute = classExecute.getMethod("help", new Class[] { boolean.class } );
-                   helpNeeded = true;
-               }
-           }
+                if (secondParam.equals("/?") || secondParam.equals("--help")) {
+                    helpType = secondParam.equals("/?");
+                    methodExecute = classExecute.getMethod("help", new Class[]{boolean.class});
+                    helpNeeded = true;
+                }
+            }
 
-           if (methodExecute == null)
-               methodExecute = classExecute.getMethod("execute", new Class[] { FileSystem.class, PrintStream.class, Object[].class } );
+            if (methodExecute == null)
+                methodExecute = classExecute.getMethod("execute", new Class[]{FileSystem.class, PrintStream.class, Object[].class});
 
-           Object executeObject = classExecute.newInstance();
+            Object executeObject = classExecute.newInstance();
 
-           if (helpNeeded) {
-               // TODO: nechci v tedle metode nic vypisovat - ale vyjimka neni dobre reseni..
-               throw new FileSystemException((String)methodExecute.invoke(executeObject, new Object[] { new Boolean(true) } ));
-           }
-           else
-               methodExecute.invoke(executeObject, args);
-           return null;
-       }
+            if (helpNeeded) {
+                ((PrintStream) args[1]).println((String) methodExecute.invoke(executeObject, new Object[]{new Boolean(true)}));
+
+                if (!helpType)
+                    ((PrintStream) args[1]).println((String) methodExecute.invoke(executeObject, new Object[]{new Boolean(false)}));
+            } else
+                methodExecute.invoke(executeObject, args);
+            return null;
+        }
     };
 
-    private Command ex = (Command)Proxy.newProxyInstance(Command.class.getClassLoader(), new Class[] { Command.class }, handler);
+    private Command ex = (Command) Proxy.newProxyInstance(Command.class.getClassLoader(), new Class[]{Command.class}, handler);
 
     protected void printPrompt() {
-        System.out.print("XDS:"+aktDir.getFullPath()+">");
+        System.out.print("XDS:" + aktDir.getFullPath() + ">");
     }
 
     protected void dispatchCommand(Vector params) throws FileSystemException {
-        ex.execute(this, System.out, params.toArray());
+        if (params.size() > 0)
+            ex.execute(this, System.out, params.toArray());
     }
 
     public void getPrompt() throws IOException {
@@ -113,11 +120,15 @@ public class FileSystem {
             while ((inner.getCause()) != null) {
                 inner = inner.getCause();
             }
-            //TODO: more somphisticated system exception dump?
-            if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
-                System.exit(0);
+
+            if (inner instanceof FileSystemException) {
+                if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
+                    System.exit(0);
+                }
+                System.out.println(inner.getMessage());
+            } else {
+                System.out.println("Internal error: " + inner.getClass().getName());
             }
-            System.out.println(inner.getMessage());
         }
     }
 }

@@ -39,7 +39,7 @@ public class cd implements Command {
                 FileSystemItem fsi = (FileSystemItem) i.next();
                 if ((fsi.getName().equals(nextDir)) && (fsi instanceof Directory)) {
                     workDir = (Directory) fsi;
-                    break start;
+                    continue start;
                 }
             }
 
@@ -53,7 +53,7 @@ public class cd implements Command {
         if (briefOnly)
             return new String("cd [dir]");
 
-        return new String("cd - Change current Directory\nUsage: cd [dir]\n\tdir - new directory. If not given, the current " +
+        return new String("cd - change current directory\n\tdir - path to set as current. If not given, the current " +
                 "directory is printed out");
     }
 }
