@@ -54,6 +54,6 @@ public class File extends FileSystemItem {
 
     protected Object clone() {
         // data se musi zkopirovat v konstruktoru!
-        return new File(name, type, attributes, null, data);
+        return new File(name, type, attributes, parent, data);
     }
 }
