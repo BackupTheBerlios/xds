@@ -1,0 +1,28 @@
+<project name="xds" default="compile">
+
+    <property name="src" value="."/>
+    <property name="dest" value="../classes"/>
+    <property name="commandZip" value="command.zip"/>
+    <property name="destJar" value="xds.jar"/>
+
+    <!--
+       Please copy command file (command.zip) to your IDE working directory
+    -->
+
+    <target name="compile">
+        <mkdir dir="${dest}/classes"/>
+        <javac srcdir="${src}" destdir="${dest}/classes"/>
+
+        <jar destfile="${dest}/${destJar}" basedir="${dest}/classes" includes="cz/xds/**" excludes="cz/xds/command/**">
+            <manifest>
+                <attribute name="Main-Class" value="cz.xds.TestClass"/>
+            </manifest>
+        </jar>
+
+        <zip destfile="${dest}/${commandZip}" basedir="${dest}/classes/cz/xds/command"/>
+        <delete dir="${dest}/classes"/>
+    </target>
+
+</project>
+
+

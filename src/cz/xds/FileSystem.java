@@ -14,6 +14,7 @@ public class FileSystem {
 
     private Directory root;
     private Directory aktDir;
+    private ClassLoader cl;
     protected BufferedReader input;
     protected PrintStream output;
     //protected IDFactory idFactory = ;
@@ -24,10 +25,11 @@ public class FileSystem {
         this.aktDir = root;
     }
 
-    public static FileSystem createFileSystem(InputStream in, PrintStream out) {
+    public static FileSystem createFileSystem(java.io.File commandFile, InputStream in, PrintStream out) throws IOException {
         FileSystem fs = new FileSystem(new Directory(new IDFactory()));
         fs.input = new BufferedReader(new InputStreamReader(in));
         fs.output = out;
+        fs.cl = new FileSystemClassLoader(commandFile);
         return fs;
     }
 
@@ -52,11 +54,6 @@ public class FileSystem {
     public Directory getRootDirectory() {
         return root;
     }
-
-    private class CommandClassLoader extends ClassLoader {
-    }
-
-    private ClassLoader cl = new CommandClassLoader();
 
     private InvocationHandler handler = new InvocationHandler() {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

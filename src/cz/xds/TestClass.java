@@ -6,21 +6,18 @@ package cz.xds;
 public class TestClass {
     public static void main(String[] args) {
         try {
-            FileSystem fs = FileSystem.createFileSystem(System.in, System.out);
+            String name = "classes\\command.zip";
+            if (args.length > 1) {
+                name = args[1];
+            }
+            System.out.println("Using command file " + name);
+            java.io.File commands = new java.io.File(name);
+            FileSystem fs = FileSystem.createFileSystem(commands, System.in, System.out);
             while (true) {
                 fs.getPrompt();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        /*
-        d.createNewFile("MyFile", "data", null);
-        Directory sub = d.createSubDir("MyDir");
-        Directory sub2 = sub.createSubDir("MyDir2");
-        File f = sub2.createNewFile("MyFile", "data", null);
-
-        System.out.println(f.getFullPath());
-        */
     }
 }

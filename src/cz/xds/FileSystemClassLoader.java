@@ -1,0 +1,58 @@
+package cz.xds;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+/**
+ * User: vsch
+ * Date: 23.12.2004
+ * Time: 10:31:01
+ */
+public class FileSystemClassLoader extends ClassLoader {
+
+    protected static final String prefix = "cz.xds.command.";
+    protected java.io.File sourceFile;
+    private ZipFile zipFile;
+
+    public FileSystemClassLoader(java.io.File sourceFile) throws IOException {
+        this.sourceFile = sourceFile;
+        this.zipFile = new ZipFile(sourceFile, ZipFile.OPEN_READ);
+    }
+
+    protected Class findClass(String name) throws ClassNotFoundException {
+        if (name.startsWith(prefix)) {
+            name = name.substring(prefix.length());
+        } else
+            throw new ClassNotFoundException();
+
+        try {
+            ZipEntry ze = zipFile.getEntry(name + ".class");
+
+            if (ze != null) {
+                InputStream in = zipFile.getInputStream(ze);
+                int length = (int) ze.getSize();
+                return defineClass(prefix + name, loadData(in, length), 0, length);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        throw new ClassNotFoundException();
+    }
+
+    private byte[] loadData(InputStream in, int length) throws IOException {
+        byte[] data = new byte[length];
+        int pos = 0;
+        int max = length;
+        int read;
+
+        while ((max > 0) && (read = in.read(data, pos, max)) != -1) {
+            pos += read;
+            max -= read;
+        }
+
+        return data;
+    }
+}
