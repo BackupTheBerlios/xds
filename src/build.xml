@@ -2,6 +2,7 @@
 
     <property name="src" value="."/>
     <property name="dest" value="../classes"/>
+    <property name="destdoc" value="../doc/javadoc/"/>
     <property name="commandZip" value="command.zip"/>
     <property name="destJar" value="xds.jar"/>
 
@@ -34,6 +35,11 @@
                 </fileset>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="javadoc">
+        <mkdir dir="${destdoc}"/>
+        <javadoc packagenames="cz.xds.*" sourcepath="${src}" destdir="${destdoc}"/>
     </target>
 
 </project>

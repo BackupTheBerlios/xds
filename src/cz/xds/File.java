@@ -48,6 +48,10 @@ public class File extends FileSystemItem {
         data = null;
     }
 
+    public byte[] getData() {
+        return data;
+    }
+
     public String toString() {
         return super.toString();
     }
