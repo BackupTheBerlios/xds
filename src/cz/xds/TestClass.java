@@ -105,7 +105,7 @@ class Runner implements Runnable {
                 fs.getPrompt();
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }
