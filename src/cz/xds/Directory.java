@@ -163,7 +163,35 @@ public class Directory extends FileSystemItem implements Browseable {
 
         super.delete();
     }
-
+    
+    /**
+     * Vraci vektor children
+     *
+     * @return Vektor children
+     */
+    public Vector get_children(){
+        return children;
+    }
+    
+    /**
+     * Vraci true pokud se v prohledavanem adresari nachazi stejne children
+     * 
+     * @param name Prohledavany adresar
+     * @return
+     * @throws FileSystemException
+     */     
+    public boolean hasSameChildren(Directory name) throws FileSystemException{
+        boolean has = true;
+        Iterator i = getIterator();
+        while (i.hasNext()) {
+            FileSystemItem fsi = (FileSystemItem) i.next();
+            if (name.findItem(fsi.getName()) == null){
+                has = false;
+            }
+        }
+        return has;
+    }
+    
     /**
      * Vraci polozku s danym nazvem, null pokud neexistuje
      *

@@ -138,12 +138,13 @@ public abstract class FileSystemItem implements Cloneable {
      * @param d Cilovy adresar
      * @throws FileSystemException
      */
-    public void move(Directory d) throws FileSystemException {
+    public FileSystemItem move(Directory d) throws FileSystemException {
         if (this == d) throw new FileSystemException("Cant't move to itself");
         if (d.findItem(name) != null) throw new FileSystemException("Target file already exists");
         parent.delete(this);
         this.parent = d;
         d.addChild(this);
+        return this;
     }
 
     /**
