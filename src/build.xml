@@ -23,6 +23,27 @@
         <delete dir="${dest}/classes"/>
     </target>
 
+	<target name="junit" depends="compile">
+	  <junit printsummary="on"
+	         fork="false"
+	         haltonfailure="false"
+	         failureproperty="tests.failed"
+	         showoutput="true">
+	     <classpath path="${src}"/>
+	     <formatter type="brief" usefile="false"/>
+
+	     <batchtest>
+	       <fileset dir="${src}">
+	         <include name="**/TestFile.java"/>
+	       </fileset>
+	     </batchtest>
+	 </junit>
+
+	  <fail if="tests.failed">
+	  Error was found
+	  </fail>
+	</target>
+	
 </project>
 
 

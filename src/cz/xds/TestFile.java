@@ -14,8 +14,11 @@ public class TestFile extends TestCase {
     private File file3 = null;
     private File file4 = null;
     private File file5 = null;
+    private Link link1 = null;
+    private Link link2 = null;
     private Directory root = null;
     private Directory level1 = null;
+    private Directory level1_1 = null;
     private Directory level2 = null;
     private Directory level3 = null;
     private Directory tmpDir = null;
@@ -36,12 +39,13 @@ public class TestFile extends TestCase {
         
     }
     
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws FileSystemException {
         file1 = null;
         file2 = null;
         file3 = null;
         file4 = null;
         level1 = null;
+        level1_1 = null;
         level2 = null;
         level3 = null;
         tmpDir = null;
@@ -50,9 +54,11 @@ public class TestFile extends TestCase {
         attrib = null;
         attribhr = null;
         data = null; 
+        link1 = null;
+        link2 = null;
     }
     
-    public void testConstructionFile() throws Exception{
+    public void testConstructionFile() throws FileSystemException{
         file1 = root.createNewFile("file1","txt",data);
         Attributes expectedAttrib = new Attributes(false,false);
         assertEquals(file1.getName(),"file1");
@@ -72,7 +78,7 @@ public class TestFile extends TestCase {
         assertNotNull(level1.get_children());
     }
     
-    public void testCopyFile() throws Exception{
+    public void testCopyFile() throws FileSystemException{
         file1 = root.createNewFile("file1","txt",data);
         file3 = (File)file1.copy(level1);
         assertEquals(file3.name, file1.name);
@@ -91,7 +97,7 @@ public class TestFile extends TestCase {
 		fail("Raise FileSystemException: Target file already exists");      
     }
     
-    public void testCopyDir() throws Exception{
+    public void testCopyDir() throws FileSystemException{
         level2 = level1.createSubDir("level2");
         file1 = level2.createNewFile("file1","txt");
         assertEquals(level2.findItem(file1.getName()),file1);
@@ -109,7 +115,7 @@ public class TestFile extends TestCase {
 		fail("Raise FileSystemException: Can't move to itself");   
     }
     
-    public void testMoveFile() throws Exception{
+    public void testMoveFile() throws FileSystemException{
         file1 = root.createNewFile("file1","txt",data);
         assertEquals(file1.parent,root);
         assertEquals(root.findItem(file1.getName()),file1);
@@ -127,7 +133,7 @@ public class TestFile extends TestCase {
 		fail("Raise FileSystemException: Target file already exists");   
     }
     
-    public void testMoveDir() throws Exception{
+    public void testMoveDir() throws FileSystemException{
         level2 = level1.createSubDir("level2");
         file2 = level2.createNewFile("file2","txt");
         assertTrue(((Directory)level2.move(root)).hasSameChildren(level2));
@@ -136,19 +142,19 @@ public class TestFile extends TestCase {
     
     
     
-    public void testDeleteFile() throws Exception{
+    public void testDeleteFile() throws FileSystemException{
         file1 = root.createNewFile("file1","txt",data);
         file1.delete();
         assertEquals(file1.data, null);
         assertEquals(file1.links.size(),0);
     }
     
-    public void testDeleteDir() throws Exception{
+    public void testDeleteDir() throws FileSystemException{
         level1.delete();
         assertNull(level1.get_children());
     }
     
-    public void testClone() throws Exception{
+    public void testClone() throws FileSystemException{
         file1 = root.createNewFile("file1","txt",data);
         file2 = (File)file1.clone();
         assertEquals(file1.name,file2.name);
@@ -157,4 +163,30 @@ public class TestFile extends TestCase {
         assertEquals(file1.data,file2.data);
     }
     
+    public void testLinkToFile() throws FileSystemException{
+        file1 = root.createNewFile("file1","txt",data);
+        link1 = file1.createLink(level1,"linkToFile1");
+        assertEquals(link1.getTarget(),file1);
+        assertEquals(link1.getParent(),level1);
+        assertNotNull(link1.getParent().findItem(link1.getName()));
+        file1.delete();
+        assertNull(link1.getParent().findItem(link1.getName()));
+    }
+    
+    public void testLinkToDir() throws FileSystemException{
+       file1 = level1.createNewFile("file1","txt",data);
+       link1 = level1.createLink(root,"linkToLevel1");
+       level2 = root.createSubDir("level2");
+       link2 = level2.createLink(root,"linkToLevel2");
+       assertEquals(link1.getTarget(),level1);
+       assertEquals(link1.getParent(),root);
+       assertEquals(link2.getTarget(),level2);
+       assertEquals(link2.getParent(),root);
+       assertNotNull(link1.getParent().findItem(link1.getName()));
+       assertNotNull(link1.getParent().findItem(link2.getName()));
+       level1.delete();
+       link2.delete();
+       assertNull(link1.getParent().findItem(link1.getName()));
+       assertEquals(root.findItem(level2.getName()),level2);
+    }
 }
