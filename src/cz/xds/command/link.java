@@ -1,9 +1,6 @@
 package cz.xds.command;
 
-import cz.xds.Command;
-import cz.xds.FileSystem;
-import cz.xds.FileSystemException;
-import cz.xds.FileSystemItem;
+import cz.xds.*;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -19,8 +16,18 @@ public class link implements Command {
         if (param.length < 3)
             throw new FileSystemException(new String("Invalid usage of 'link'. Use: ") + help(true));
 
+        // TODO Support links in foreign directories
         String linkName = (String) param[2], linkTarget = (String) param[1];
-        Iterator it = fs.getCurrentDirectory().getIterator();
+        Directory dir = fs.getCurrentDirectory();
+
+        int index = linkTarget.lastIndexOf(Path.PATH_SEPARATOR);
+
+        if (index != -1) {
+            dir = Path.parseDirectory(fs, linkTarget.substring(0, index + 1));
+            linkTarget = linkTarget.substring(index + 1);
+        }
+
+        Iterator it = dir.getIterator();
 
         while (it.hasNext()) {
             FileSystemItem fsi = (FileSystemItem) it.next();

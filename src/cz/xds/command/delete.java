@@ -1,9 +1,6 @@
 package cz.xds.command;
 
-import cz.xds.Command;
-import cz.xds.FileSystem;
-import cz.xds.FileSystemException;
-import cz.xds.FileSystemItem;
+import cz.xds.*;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -18,11 +15,30 @@ public class delete implements Command {
         }
 
         String name = (String) param[1];
-        Iterator it = fs.getCurrentDirectory().getIterator();
+        Directory dir = fs.getCurrentDirectory();
+
+        int index = name.lastIndexOf(Path.PATH_SEPARATOR);
+
+        if (index != -1) {
+            dir = Path.parseDirectory(fs, name.substring(0, index + 1));
+            name = name.substring(index + 1);
+        }
+
+        Iterator it = dir.getIterator();
 
         while (it.hasNext()) {
             FileSystemItem fsi = (FileSystemItem) it.next();
             if (fsi.getName().equals(name)) {
+
+                // Prece si nesmazu adresar ve ktere jsem :)
+                Directory tmp = fs.getCurrentDirectory().getParent();
+                if (fs.getCurrentDirectory() != fs.getRootDirectory()) {
+                    while (tmp != null) {
+                        if (tmp == dir) throw new FileSystemException("Can't delete actual directory");
+                        tmp = tmp.getParent();
+                    }
+                }
+
                 fsi.delete();
                 return;
             }

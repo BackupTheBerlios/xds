@@ -1,8 +1,6 @@
 package cz.xds.command;
 
-import cz.xds.Command;
-import cz.xds.FileSystem;
-import cz.xds.FileSystemException;
+import cz.xds.*;
 
 import java.io.PrintStream;
 
@@ -15,7 +13,17 @@ public class mkdir implements Command {
             throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
         }
 
-        fs.getCurrentDirectory().createSubDir((String) param[1]);
+        String name = (String) param[1];
+        Directory dir = fs.getCurrentDirectory();
+
+        int index = name.lastIndexOf(Path.PATH_SEPARATOR);
+
+        if (index != -1) {
+            dir = Path.parseDirectory(fs, name.substring(0, index + 1));
+            name = name.substring(index + 1);
+        }
+
+        dir.createSubDir(name);
     }
 
     public String help(boolean briefOnly) {

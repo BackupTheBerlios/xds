@@ -1,8 +1,6 @@
 package cz.xds.command;
 
-import cz.xds.Command;
-import cz.xds.FileSystem;
-import cz.xds.FileSystemItem;
+import cz.xds.*;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -11,8 +9,15 @@ import java.util.Iterator;
  * Vypisuje obsah aktualniho adresare
  */
 public class dir implements Command {
-    public void execute(FileSystem fs, PrintStream outStream, Object[] param) {
-        Iterator it = fs.getCurrentDirectory().getIterator();
+    public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
+        Directory d;
+
+        if (param.length == 1) {
+            d = fs.getCurrentDirectory();
+        } else {
+            d = Path.parseDirectory(fs, (String) param[1]);
+        }
+        Iterator it = d.getIterator();
 
         while (it.hasNext()) {
             FileSystemItem i = (FileSystemItem) it.next();
