@@ -8,7 +8,7 @@ public class File extends FileSystemItem {
     protected byte[] data;
 
     /**
-     * Implicitni chraneny konstruktor, soubory jsou bezne vytvareny metodami tridy Directory
+     * Implicitni chraneny konstruktor, soubory musi byt vytvareny metodami tridy Directory, jinak nedojde ke korektni registraci polozky u prvku parent (nedojde k volani adddChild).
      *
      * @param name       Jmeno souboru
      * @param type       Typ souboru

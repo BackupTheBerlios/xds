@@ -3,8 +3,7 @@ package cz.xds;
 import java.util.HashMap;
 
 /**
- * Date: 22.12.2004
- * Time: 0:01:40
+ * Tøída generujeunikatní identifikaèní èísla nových objektù FileSystemItem
  */
 public class IDFactory {
     // Mapa id->FileSystemItem (pro perzistenci)

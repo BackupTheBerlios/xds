@@ -23,7 +23,7 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     /**
-     * Standardni chraneny konstruktor
+     * Standardni chraneny konstruktor, pro vytvareni podadresaru je nutne pouzit k tomu urcene metody teto tridy (CreateSubDir), jinak nedojde ke korektni registrace nove polozky v rodicovskem prvku.
      *
      * @param name       Jmeno adresare
      * @param parent     Rodic adresare
@@ -58,7 +58,7 @@ public class Directory extends FileSystemItem implements Browseable {
      *
      * @param name Nazev
      * @return Vraci referenci na vytvoreny adresar
-     * @throws FileSystemException
+     * @throws FileSystemException V pripade, ze polozka stejneho jmena jiz existuje
      */
     public Directory createSubDir(String name) throws FileSystemException {
         Attributes at = new Attributes(false, false);
@@ -71,7 +71,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @param name       Nazev
      * @param attributes Atributy
      * @return Reference na novy adresar
-     * @throws FileSystemException
+     * @throws FileSystemException V pripdae, ze polozka stejneho jmena jiz existuje
      */
     public Directory createSubDir(String name, Attributes attributes) throws FileSystemException {
         return (Directory) addChild(new Directory(name, this, attributes));
@@ -92,7 +92,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @param name Jmeno souboru
      * @param type Typ souboru
      * @return Reference na vytvoreny soubor
-     * @throws FileSystemException
+     * @throws FileSystemException V pripdae, ze polozka stejneho jmena jiz existuje
      */
     public File createNewFile(String name, String type) throws FileSystemException {
         Attributes at = new Attributes(false, false);
@@ -107,7 +107,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @param type Typ souboru
      * @param data Obsah souboru
      * @return Reference na vytvoreny soubor
-     * @throws FileSystemException
+     * @throws FileSystemException V pripdae, ze polozka stejneho jmena jiz existuje
      */
     public File createNewFile(String name, String type, byte[] data) throws FileSystemException {
         Attributes at = new Attributes(false, false);
@@ -123,7 +123,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @param data       Obsah souboru
      * @param attributes Atributy
      * @return Reference na vytvoreny soubor
-     * @throws FileSystemException
+     * @throws FileSystemException V pripdae, ze polozka stejneho jmena jiz existuje
      */
     public File createNewFile(String name, String type, Attributes attributes, byte[] data) throws FileSystemException {
         return (File) addChild(new File(name, type, attributes, this, data));
@@ -163,35 +163,35 @@ public class Directory extends FileSystemItem implements Browseable {
 
         super.delete();
     }
-    
+
     /**
      * Vraci vektor children
      *
      * @return Vektor children
      */
-    public Vector get_children(){
+    protected Vector get_children() {
         return children;
     }
-    
+
     /**
      * Vraci true pokud se v prohledavanem adresari nachazi stejne children
-     * 
+     *
      * @param name Prohledavany adresar
      * @return
      * @throws FileSystemException
-     */     
-    public boolean hasSameChildren(Directory name) throws FileSystemException{
+     */
+    public boolean hasSameChildren(Directory name) throws FileSystemException {
         boolean has = true;
         Iterator i = getIterator();
         while (i.hasNext()) {
             FileSystemItem fsi = (FileSystemItem) i.next();
-            if (name.findItem(fsi.getName()) == null){
+            if (name.findItem(fsi.getName()) == null) {
                 has = false;
             }
         }
         return has;
     }
-    
+
     /**
      * Vraci polozku s danym nazvem, null pokud neexistuje
      *
@@ -239,7 +239,7 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     /**
-     * Vytvari deep-copy tohoto adresare, tedy kopiruje rekurzivne i detske polozky 
+     * Vytvari deep-copy tohoto adresare, tedy kopiruje rekurzivne i detske polozky
      *
      * @return reference na novou deep-copy
      */
