@@ -27,7 +27,11 @@ public class Link extends FileSystemItem {
         target.removeLink(this);
     }
 
-    public void copy(Directory d) throws FileSystemException {
+    protected Object clone() {
+        Link newLink = new Link(target, null, name);
 
+        target.addLink(newLink);
+
+        return newLink;
     }
 }

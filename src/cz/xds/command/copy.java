@@ -5,9 +5,10 @@ import cz.xds.*;
 import java.io.PrintStream;
 
 /**
- * Presouva polozku do jineho adresare
+ * Date: 18.12.2004
+ * Time: 18:59:55
  */
-public class move implements Command {
+public class copy implements Command {
     public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
         if (param.length < 3) {
             throw new FileSystemException(new String("Invalid usage. Use: ") + help(true));
@@ -17,18 +18,23 @@ public class move implements Command {
         Directory srcDir = sourcePath.getDirectory(fs);
         Directory destDir = destPath.getDirectory(fs);
 
-        FileSystemItem toMove = srcDir.findItem(sourcePath.getItemName());
+        FileSystemItem toCopy = srcDir.findItem(sourcePath.getItemName());
 
-        if (toMove == null)
+        if (toCopy == null)
             throw new FileSystemException("Item not found");
 
-        if (toMove instanceof Directory && ((Directory)toMove).isNondirectParentOf(destDir))
-            throw new FileSystemException("Invalid move attempt");
+        if (toCopy instanceof Directory && ((Directory)toCopy).isNondirectParentOf(destDir))
+            throw new FileSystemException("Invalid copy attempt");
 
-        toMove.move(destDir);
+        toCopy.copy(destDir);
     }
 
     public String help(boolean briefOnly) {
-        return new String(briefOnly ? "move source dest" : "move - moves item to another directory\n\t");
+        if (briefOnly)
+            return new String("copy source dest");
+
+        return new String("copy - copy source item to another directory\n\tsource - source item name." +
+                "\n\tdest - target directory");
     }
 }
+

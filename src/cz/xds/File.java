@@ -13,7 +13,7 @@ public class File extends FileSystemItem {
         this.id = 200;
         this.attributes = attributes;
         this.parent = parent;
-        this.data = data;
+        this.data = data;  // deep!
     }
 
     public Link createLink(Directory linkDir, String name) throws FileSystemException {
@@ -25,11 +25,12 @@ public class File extends FileSystemItem {
         data = null;
     }
 
-    public void copy(Directory d) throws FileSystemException {
-
-    }
-
     public String toString() {
         return super.toString();
+    }
+
+    protected Object clone() {
+        // data se musi zkopirovat v konstruktoru!
+        return new File(name, type, attributes, null, data);
     }
 }

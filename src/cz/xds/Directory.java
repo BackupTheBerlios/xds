@@ -97,7 +97,35 @@ public class Directory extends FileSystemItem implements Browseable {
         children.remove(fsi);
     }
 
-    public void copy(Directory d) throws FileSystemException {
+    public boolean isNondirectParentOf(Directory testDir) {
+        while ((testDir = testDir.getParent()) != null)
+            if (testDir == this)
+                return true;
 
+        return false;
+    }
+
+    protected Object clone() {
+        Directory newDir = new Directory(name, null, attributes);
+
+        // rekurzivne zkopirovat vsechny podslozky a soubory
+
+        Iterator it = children.iterator();
+
+        try {
+            while (it.hasNext()) {
+                // TODO: trosku divne, nicmene spravne. Mozna by bylo lepci se vysrat na
+                // konvence a udelat neco vlastniho (clone() s parametrem parent a
+                // vracejici FileSystemItem.. ?
+
+                FileSystemItem newItem = (FileSystemItem)((FileSystemItem)it.next()).clone();
+                newItem.parent = newDir;
+                newDir.addChild((FileSystemItem)newItem);
+            }
+        } catch (FileSystemException e) {
+            return null;
+        }
+
+        return newDir;
     }
 }

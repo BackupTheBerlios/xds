@@ -5,7 +5,7 @@ import java.util.Vector;
 /**
  * Zakladni trida reprezentujici obecnou polozku souboroveho systemu.
  */
-public abstract class FileSystemItem {
+public abstract class FileSystemItem implements Cloneable {
     protected String name;
     protected Attributes attributes = new Attributes();
     protected long id;
@@ -59,9 +59,17 @@ public abstract class FileSystemItem {
         links.remove(l);
     }
 
+    protected abstract Object clone();
     public abstract Link createLink(Directory linkDir, String name) throws FileSystemException;
 
-    public abstract void copy(Directory d) throws FileSystemException;
+    public void copy(Directory d) throws FileSystemException {
+        if (this == d) throw new FileSystemException("Cant't move to itself");
+        if (d.findItem(name) != null) throw new FileSystemException("Target file already exists");
+
+        FileSystemItem newItem = (FileSystemItem)clone();
+        newItem.parent = d;
+        d.addChild(newItem);
+    }
 
     public void move(Directory d) throws FileSystemException {
         if (this == d) throw new FileSystemException("Cant't move to itself");

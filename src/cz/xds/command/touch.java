@@ -5,7 +5,7 @@ import cz.xds.*;
 import java.io.PrintStream;
 
 /**
- * Vypisuje obsah aktualniho adresare
+ * Vytvari novy soubor pozadovaneho typu
  */
 public class touch implements Command {
     public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
@@ -19,7 +19,7 @@ public class touch implements Command {
     }
 
     public String help(boolean briefOnly) {
-        return new String("touch filename filetype");
-        //TODO: kompletni napoveda
+        return new String(briefOnly ? "touch filename type" : "touch - create a new file.\n" +
+                "\tfilename - new file name\n\ttype - new file type");
     }
 }
