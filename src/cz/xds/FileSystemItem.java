@@ -55,6 +55,10 @@ public abstract class FileSystemItem {
         }
     }
 
+    protected void removeLink(Link l) throws FileSystemException {
+        links.remove(l);
+    }
+
     public abstract Link createLink(Directory linkDir, String name) throws FileSystemException;
 
     public abstract void copy(Directory d) throws FileSystemException;

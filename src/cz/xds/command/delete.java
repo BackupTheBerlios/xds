@@ -18,14 +18,11 @@ public class delete implements Command {
 
         FileSystemItem target = dir.findItem(p.getItemName());
         if (target != null) {
-            // Prece si nesmazu adresar ve ktere jsem, ale asi by ten kod nemel byt tady... :)
-            Directory tmp = fs.getCurrentDirectory().getParent();
-            if (fs.getCurrentDirectory() != fs.getRootDirectory()) {
-                while (tmp != null) {
-                    if (tmp == dir) throw new FileSystemException("Can't delete actual directory");
-                    tmp = tmp.getParent();
-                }
-            }
+            if (target instanceof Directory) dir = (Directory) target;
+            Directory tmp = fs.getCurrentDirectory();
+            do {
+                if (tmp == target) throw new FileSystemException("Can't delete actual directory");
+            } while ((tmp = tmp.getParent()) != null);
 
             target.delete();
             return;

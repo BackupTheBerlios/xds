@@ -7,10 +7,10 @@ package cz.xds;
 public class Link extends FileSystemItem {
     private FileSystemItem target;
 
-    public Link(FileSystemItem target, String name) {
+    public Link(FileSystemItem target, Directory parent, String name) {
         this.target = target;
         this.name = name;
-        this.parent = target.parent;
+        this.parent = parent;
     }
 
     public FileSystemItem getTarget() {
@@ -24,7 +24,7 @@ public class Link extends FileSystemItem {
     public void delete() throws FileSystemException {
         super.delete();
 
-        target.delete();
+        target.removeLink(this);
     }
 
     public void copy(Directory d) throws FileSystemException {
