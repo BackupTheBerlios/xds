@@ -27,6 +27,9 @@ public class TestFile extends TestCase {
     private Attributes attribhr = null;
     private byte[] data = null;
 
+    /**
+     * Inicializace testu. Probehne pred kazdym testXXX().
+     */
     protected void setUp() throws Exception {
         super.setUp();
         fact = new IDFactory();
@@ -39,6 +42,9 @@ public class TestFile extends TestCase {
 
     }
 
+    /**
+     * Finalizace testu. Probehne po kazde metode testXXX()
+     */
     protected void tearDown() throws FileSystemException {
         file1 = null;
         file2 = null;
@@ -58,6 +64,10 @@ public class TestFile extends TestCase {
         link2 = null;
     }
 
+    /**
+     * Metoda kontroluje zda byl soubor dobre vytvoren (kontroluje zda metody pro praci ze soubororem vraci spravne hodnoty)
+     * @throws FileSystemException
+     */
     public void testConstructionFile() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         Attributes expectedAttrib = new Attributes(false, false);
@@ -69,6 +79,10 @@ public class TestFile extends TestCase {
         assertEquals(file1.getParent(), root);
     }
 
+    
+    /**
+     * Test kontroluje zda byl dobre vytvoren adresar a zda metody pro praci s adresarem vraci ocekavane hodnoty.
+     */
     public void testConstructionDir() {
         Attributes expectedAttrib = new Attributes(false, false);
         assertEquals(level1.getName(), "level1");
@@ -78,6 +92,10 @@ public class TestFile extends TestCase {
         assertNotNull(level1.get_children());
     }
 
+    /**
+     * Test kopirovani souboru. Kontrola zda novy soubor ma stejne atributy, jmeno, data.
+     * @throws FileSystemException
+     */
     public void testCopyFile() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         file3 = (File) file1.copy(level1);
@@ -96,6 +114,11 @@ public class TestFile extends TestCase {
         fail("Raise FileSystemException: Target file already exists");
     }
 
+    
+    /**
+     * Test kopirovani adresare. Kontola jmena, atributu, umisteni a zda se zkopiroval ze vsemi potomky.
+     * @throws FileSystemException
+     */
     public void testCopyDir() throws FileSystemException {
         level2 = level1.createSubDir("level2");
         file1 = level2.createNewFile("file1", "txt");
@@ -113,6 +136,10 @@ public class TestFile extends TestCase {
         fail("Raise FileSystemException: Can't move to itself");
     }
 
+    /**
+     * Test presunu souboru. Kontrola zda je v novem umisteni a smazan v puv. umisteni.
+     * @throws FileSystemException
+     */
     public void testMoveFile() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         assertEquals(file1.parent, root);
@@ -130,26 +157,46 @@ public class TestFile extends TestCase {
         fail("Raise FileSystemException: Target file already exists");
     }
 
+    /**
+     * Test presunu adresare. Kontrola zda byl presunut i s potomky. A zda byl smazan z puv. umisteni
+     * @throws FileSystemException
+     */
     public void testMoveDir() throws FileSystemException {
         level2 = level1.createSubDir("level2");
         file2 = level2.createNewFile("file2", "txt");
+        assertNotNull(level1.findItem(level2.getName()));
         assertTrue(((Directory) level2.move(root)).hasSameChildren(level2));
+        assertNotNull(root.findItem(level2.getName()));
+        assertNull(level1.findItem(level2.getName()));
         assertEquals(level2.parent, root);
     }
 
 
+    /**
+     * Test mazani souboru.
+     * @throws FileSystemException
+     */
     public void testDeleteFile() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         file1.delete();
         assertEquals(file1.data, null);
         assertEquals(file1.links.size(), 0);
     }
-
+    
+    
+    /**
+     * Test mazani adresare.
+     * @throws FileSystemException
+     */
     public void testDeleteDir() throws FileSystemException {
         level1.delete();
         assertNull(level1.get_children());
     }
 
+    /**
+     * Test kopie souboru.
+     * @throws FileSystemException
+     */
     public void testClone() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         file2 = (File) file1.clone();
@@ -159,6 +206,10 @@ public class TestFile extends TestCase {
         assertEquals(file1.data, file2.data);
     }
 
+    /**
+     * Test linku na soubor. Kontrola zda po smazani souboru link existuje
+     * @throws FileSystemException
+     */
     public void testLinkToFile() throws FileSystemException {
         file1 = root.createNewFile("file1", "txt", data);
         link1 = file1.createLink(level1, "linkToFile1");
@@ -169,6 +220,10 @@ public class TestFile extends TestCase {
         assertNull(link1.getParent().findItem(link1.getName()));
     }
 
+    /**
+     * Test linku k adresari. Po smazani adresare linx neexistuje. Test po smazani linku adresar zustava.
+     * @throws FileSystemException
+     */
     public void testLinkToDir() throws FileSystemException {
         file1 = level1.createNewFile("file1", "txt", data);
         link1 = level1.createLink(root, "linkToLevel1");
