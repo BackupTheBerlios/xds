@@ -8,6 +8,8 @@ public class Link extends FileSystemItem {
     private FileSystemItem target;
 
     public Link(FileSystemItem target, Directory parent, String name) {
+        super(parent.idFactory);
+        
         this.target = target;
         this.name = name;
         this.parent = parent;

@@ -16,16 +16,16 @@ public class FileSystem {
     private Directory aktDir;
     protected BufferedReader input;
     protected PrintStream output;
+    //protected IDFactory idFactory = ;
 
     protected FileSystem(Directory root) {
+        //root.idFactory = idFactory;
         this.root = root;
         this.aktDir = root;
     }
 
     public static FileSystem createFileSystem(InputStream in, PrintStream out) {
-        Attributes at = new Attributes(false, false);
-        Directory d = new Directory(Path.PATH_SEPARATOR, null, at);
-        FileSystem fs = new FileSystem(d);
+        FileSystem fs = new FileSystem(new Directory(new IDFactory()));
         fs.input = new BufferedReader(new InputStreamReader(in));
         fs.output = out;
         return fs;

@@ -8,9 +8,10 @@ public class File extends FileSystemItem {
     protected byte[] data;
 
     protected File(String name, String type, Attributes attributes, Directory parent, byte[] data) {
+        super(parent.idFactory);
+        
         this.name = name;
         this.type = type;
-        this.id = 200;
         this.attributes = attributes;
         this.parent = parent;
         this.data = data;  // deep!

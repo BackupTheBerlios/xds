@@ -7,15 +7,23 @@ import java.util.Vector;
  * Trida reprezentuje adresar souboroveho systemu
  */
 public class Directory extends FileSystemItem implements Browseable {
-    private Vector children;
+    private Vector children = new Vector();
+
+    // spesl konstruktor pro root
+    protected Directory(IDFactory idFactory) {
+        super(idFactory);
+
+        this.name = Path.PATH_SEPARATOR;
+        this.parent = null;
+        this.attributes = new Attributes(false, false);
+    }
 
     protected Directory(String name, Directory parent, Attributes attributes) {
+        super(parent.idFactory);
+
         this.name = name;
-        this.id = 100;
         this.parent = parent;
         this.attributes = attributes;
-
-        children = new Vector();
     }
 
     public FileSystemItem addChild(FileSystemItem child) throws FileSystemException {

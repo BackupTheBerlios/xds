@@ -11,6 +11,12 @@ public abstract class FileSystemItem implements Cloneable {
     protected long id;
     protected Directory parent;
     protected Vector links = new Vector();
+    protected IDFactory idFactory;
+
+    public FileSystemItem(IDFactory idFactory) {
+        this.idFactory = idFactory;
+        id = idFactory.createNewID(this);
+    }
 
     public String getName() {
         return name;
@@ -87,7 +93,7 @@ public abstract class FileSystemItem implements Cloneable {
         if (!(this instanceof Link))
             removeLinks();
 
-        //links = null;
+        idFactory.deleteID(id);
     }
 
     public void checkDeletable() throws AccessException {
