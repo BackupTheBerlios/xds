@@ -239,9 +239,9 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     /**
-     * Vytvari deep-copy tohoto adresare
+     * Vytvari deep-copy tohoto adresare, tedy kopiruje rekurzivne i detske polozky 
      *
-     * @return
+     * @return reference na novou deep-copy
      */
     protected Object clone() {
         Directory newDir = new Directory(name, parent, attributes);
@@ -252,10 +252,6 @@ public class Directory extends FileSystemItem implements Browseable {
 
         try {
             while (it.hasNext()) {
-                // TODO: trosku divne, nicmene spravne. Mozna by bylo lepci se vysrat na
-                // konvence a udelat neco vlastniho (clone() s parametrem parent a
-                // vracejici FileSystemItem.. ?
-
                 FileSystemItem newItem = (FileSystemItem) ((FileSystemItem) it.next()).clone();
                 newItem.parent = newDir;
                 newDir.addChild((FileSystemItem) newItem);

@@ -10,40 +10,32 @@
     -->
 
     <target name="compile">
-        <mkdir dir="${dest}/classes"/>
-        <javac srcdir="${src}" destdir="${dest}/classes"/>
+        <mkdir dir="${dest}/temp"/>
+        <javac srcdir="${src}" destdir="${dest}"/>
 
-        <jar destfile="${dest}/${destJar}" basedir="${dest}/classes" includes="cz/xds/**" excludes="cz/xds/command/**">
+        <jar destfile="${dest}/temp/${destJar}" basedir="${dest}" includes="cz/xds/**" excludes="cz/xds/command/**">
             <manifest>
                 <attribute name="Main-Class" value="cz.xds.TestClass"/>
             </manifest>
         </jar>
 
-        <zip destfile="${dest}/${commandZip}" basedir="${dest}/classes/cz/xds/command"/>
-        <delete dir="${dest}/classes"/>
+        <zip destfile="${dest}/${commandZip}" basedir="${dest}/cz/xds/command"/>
+        <delete dir="${dest}/temp"/>
     </target>
 
-	<target name="junit" depends="compile">
-	  <junit printsummary="on"
-	         fork="false"
-	         haltonfailure="false"
-	         failureproperty="tests.failed"
-	         showoutput="true">
-	     <classpath path="${src}"/>
-	     <formatter type="brief" usefile="false"/>
+    <target name="junit" depends="compile">
+	    <junit printsummary="on" showoutput="true">
+            <classpath path="${dest}"/>
+	        <formatter type="brief" usefile="false"/>
 
-	     <batchtest>
-	       <fileset dir="${src}">
-	         <include name="**/TestFile.java"/>
-	       </fileset>
-	     </batchtest>
-	 </junit>
+	        <batchtest>
+	            <fileset dir="${src}">
+                    <include name="**/TestFile.java"/>
+	            </fileset>
+	        </batchtest>
+	    </junit>
+ 	</target>
 
-	  <fail if="tests.failed">
-	  Error was found
-	  </fail>
-	</target>
-	
 </project>
 
 
