@@ -4,17 +4,22 @@ import cz.xds.*;
 
 import java.util.StringTokenizer;
 import java.util.Iterator;
+import java.io.*;
 
 /**
  * Vypisuje obsah aktualniho adresare
  */
 public class cd implements Command {
-    public void execute(Object[] param) throws FileSystemException {
-        FileSystem fs = (FileSystem)param[0];
-        Directory workDir = fs.getCurrentDirectory();
-        String newDir = (String)param[2];
+    public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
+        if (param.length == 1) {
+            outStream.println(fs.getCurrentDirectory().getFullPath());
+            return;
+        }
 
-        StringTokenizer st = new StringTokenizer(newDir, "/\\");
+        Directory workDir = fs.getCurrentDirectory();
+        String newDir = (String)param[1];
+
+        StringTokenizer st = new StringTokenizer(newDir, "/");
 
         start: while (st.hasMoreTokens()) {
             String nextDir = st.nextToken();

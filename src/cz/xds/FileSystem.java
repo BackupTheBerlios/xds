@@ -29,11 +29,9 @@ public class FileSystem {
     protected Vector getCommand() throws IOException {
         StringTokenizer st = new StringTokenizer(br.readLine());
         Vector retVal = new Vector();
-        retVal.add(this);
 
-        while (st.hasMoreTokens()) {
+        while (st.hasMoreTokens())
             retVal.add(st.nextToken());
-        }
 
         return retVal;
     }
@@ -53,14 +51,14 @@ public class FileSystem {
 
     private InvocationHandler handler = new InvocationHandler() {
        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-           String command = "cz.xds.command."+((Object[])args[0])[1];
+           String command = "cz.xds.command."+((Object[])args[2])[0];
            Class classExecute;
            try {
-           classExecute = cl.loadClass(command);
+                classExecute = cl.loadClass(command);
            } catch (ClassNotFoundException e) {
                throw new FileSystemException ("Command not found");
            }
-           Method methodExecute = classExecute.getMethod("execute", new Class[] { Object[].class } );
+           Method methodExecute = classExecute.getMethod("execute", new Class[] { FileSystem.class, PrintStream.class, Object[].class } );
            Object executeObject = classExecute.newInstance();
            methodExecute.invoke(executeObject, args);
            return null;
@@ -74,7 +72,7 @@ public class FileSystem {
     }
 
     protected void dispatchCommand(Vector params) throws FileSystemException {
-        ex.execute(params.toArray());
+        ex.execute(this, System.out, params.toArray());
     }
 
     public void getPrompt() throws IOException {

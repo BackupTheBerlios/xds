@@ -2,6 +2,8 @@ package cz.xds.command;
 
 import cz.xds.*;
 
+import java.io.PrintStream;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Vašek
@@ -11,7 +13,7 @@ import cz.xds.*;
  * zkouška pøidání øádku
  */
 public class pwd implements Command {
-	public void execute(Object[] param) {
-        System.out.println(((FileSystem)param[0]).getCurrentDirectory().getFullPath());
+	public void execute(FileSystem fs, PrintStream outStream, Object[] param) {
+        outStream.println(fs.getCurrentDirectory().getFullPath());
     }
 }

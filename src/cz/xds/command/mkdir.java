@@ -4,11 +4,13 @@ import cz.xds.Command;
 import cz.xds.FileSystemException;
 import cz.xds.FileSystem;
 
+import java.io.PrintStream;
+
 /**
     Vypisuje obsah aktualniho adresare
  */
 public class mkdir implements Command {
-    public void execute(Object[] param) throws FileSystemException {
-        ((FileSystem)param[0]).getCurrentDirectory().createSubDir((String)param[2]);
+    public void execute(FileSystem fs, PrintStream outStream, Object[] param) throws FileSystemException {
+        fs.getCurrentDirectory().createSubDir((String)param[1]);
     }
 }
