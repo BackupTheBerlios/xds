@@ -44,6 +44,10 @@ public class FileSystem {
         return aktDir;
     }
 
+    public Directory getRootDirectory() {
+        return root;
+    }
+
     private class CommandClassLoader extends ClassLoader {
     }
 

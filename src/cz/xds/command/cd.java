@@ -19,6 +19,11 @@ public class cd implements Command {
         Directory workDir = fs.getCurrentDirectory();
         String newDir = (String)param[1];
 
+        if (newDir.equals(Path.PATH_SEPARATOR)) {
+            fs.changeDirectory(fs.getRootDirectory());
+            return;
+        }
+
         StringTokenizer st = new StringTokenizer(newDir, Path.PATH_SEPARATOR);
 
         start: while (st.hasMoreTokens()) {
