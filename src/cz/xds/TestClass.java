@@ -1,10 +1,5 @@
 package cz.xds;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * Testovaci trida
@@ -19,27 +14,34 @@ public class TestClass {
             final String fileName = name;
 
             System.out.println("Using command file " + name);
+            java.io.File commands = new java.io.File(fileName);
+            FileSystem fs = FileSystem.createFileSystem(commands, System.in, System.out);
 
-            Runnable r = new Runnable() {
-                public void run() {
-                    try {
-                        ServerSocket ss = new ServerSocket(1000);
-                        while (true) {
-                            Socket soc = ss.accept();
-                            java.io.File commands = new java.io.File(fileName);
-                            Runner run = new Runner(commands, soc);
-                            Thread r = new Thread(run);
-                            r.start();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
+            while (true) {
+                fs.getPrompt();
+            }
+            /*
+                      Runnable r = new Runnable() {
+                          public void run() {
+                              try {
+                                  ServerSocket ss = new ServerSocket(1000);
+                                  while (true) {
+                                      Socket soc = ss.accept();
+                                      java.io.File commands = new java.io.File(fileName);
+                                      Runner run = new Runner(commands, soc);
+                                      Thread r = new Thread(run);
+                                      r.start();
+                                  }
+                              } catch (IOException e) {
+                                  e.printStackTrace();
+                              }
+                          }
+                      };
 
-            Thread t = new Thread(r);
-            t.start();
-
+                      Thread t = new Thread(r);
+                      t.start();
+          */
+/*
             Socket soc = new Socket("127.0.0.1", 1000);
             final PrintStream out = new PrintStream(soc.getOutputStream());
             final InputStream in = soc.getInputStream();
@@ -60,7 +62,8 @@ public class TestClass {
                     }
                 }
             };
-
+*/
+/*
             Runnable write = new Runnable() {
                 public void run() {
                     int read = 0;
@@ -77,18 +80,20 @@ public class TestClass {
                     }
                 }
             };
-
+*/
+            /*
             Thread readThread = new Thread(read);
             Thread writeThread = new Thread(write);
             readThread.start();
             writeThread.start();
-
+            */
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
 
+/*
 class Runner implements Runnable {
     java.io.File commands;
     Socket soc;
@@ -108,4 +113,6 @@ class Runner implements Runnable {
             e.printStackTrace();
         }
     }
+
 }
+*/

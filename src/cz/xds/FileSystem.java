@@ -168,7 +168,7 @@ public class FileSystem {
                 if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
                     input.close();
                     output.close();
-                    //System.exit(0);
+                    System.exit(0);
                 }
                 output.println(inner.getMessage());
             } else {
