@@ -7,6 +7,8 @@ public class Attributes {
     private boolean isHidden;
     private boolean isReadOnly;
 
+    public Attributes() {
+    }
     /**
      * Zakladni konstruktor, hidden oznacuje skryty soubor, readOnly soubor jen pro cteni. 
      * @param isHidden parametr hidden
