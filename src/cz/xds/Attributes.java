@@ -66,6 +66,23 @@ public class Attributes {
         this.isReadOnly = isReadOnly;
     }
 
+    /**
+     * Porovnava atributy
+     *
+     * @param obj Porovnavany objekt
+     * @return Vraci true, pokud jsou objekty stejne, jinak false
+     */
+    public boolean equals(Object obj) {
+        if (obj instanceof Attributes) {
+            Attributes a = (Attributes) obj;
+            if (a.isReadOnly != isReadOnly) return false;
+            if (a.isHidden() != isHidden()) return false;
+        } else
+            return false;
+
+        return true;
+    }
+
     public String toString() {
         StringBuffer sb = new StringBuffer();
 
