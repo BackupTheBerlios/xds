@@ -55,7 +55,7 @@ public abstract class FileSystemItem {
         }
     }
 
-    public abstract Link createLink(String name) throws FileSystemException;
+    public abstract Link createLink(Directory linkDir, String name) throws FileSystemException;
 
     public abstract void copy(Directory d) throws FileSystemException;
 

@@ -56,8 +56,8 @@ public class Directory extends FileSystemItem implements Browseable {
         return (File) addChild(new File(name, type, attributes, this, data));
     }
 
-    public Link createLink(String name) throws FileSystemException {
-        Link newLink = (Link) getParent().addChild(new Link(this, name));
+    public Link createLink(Directory linkDir, String name) throws FileSystemException {
+        Link newLink = (Link) linkDir.addChild(new Link(this, name));
         addLink(newLink);
 
         return newLink;

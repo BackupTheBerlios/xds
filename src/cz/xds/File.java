@@ -16,8 +16,8 @@ public class File extends FileSystemItem {
         this.data = data;
     }
 
-    public Link createLink(String name) throws FileSystemException {
-        return addLink((Link) getParent().addChild(new Link(this, name)));
+    public Link createLink(Directory linkDir, String name) throws FileSystemException {
+        return addLink((Link) linkDir.addChild(new Link(this, name)));
     }
 
     public void delete() throws FileSystemException {

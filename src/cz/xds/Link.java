@@ -17,7 +17,7 @@ public class Link extends FileSystemItem {
         return target;
     }
 
-    public Link createLink(String linkName) throws FileSystemException {
+    public Link createLink(Directory linkDir, String linkName) throws FileSystemException {
         throw new FileSystemException("Can't link to link");
     }
 

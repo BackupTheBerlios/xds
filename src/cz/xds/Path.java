@@ -78,9 +78,15 @@ public class Path {
             Iterator i = workDir.getIterator();
             while (i.hasNext()) {
                 FileSystemItem fsi = (FileSystemItem) i.next();
-                if ((fsi.getName().equals(nextDir)) && (fsi instanceof Directory)) {
-                    workDir = (Directory) fsi;
-                    continue start;
+                if ((fsi.getName().equals(nextDir))) {
+                    if (fsi instanceof Directory) {
+                        workDir = (Directory) fsi;
+                        continue start;
+                    } else if (fsi instanceof Link && (((Link)fsi).getTarget() instanceof Directory)) {
+                        workDir = (Directory)((Link)fsi).getTarget();
+                        continue start;
+                    }
+
                 }
             }
 

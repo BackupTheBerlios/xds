@@ -16,27 +16,16 @@ public class link implements Command {
         if (param.length < 3)
             throw new FileSystemException(new String("Invalid usage of 'link'. Use: ") + help(true));
 
-        // TODO Support links in foreign directories
-        String linkName = (String) param[2], linkTarget = (String) param[1];
-        Directory dir = fs.getCurrentDirectory();
+        Path linkTargetPath = new Path((String) param[1], false), linkPath = new Path((String) param[2], false);
+        Directory srcDir = linkTargetPath.getDirectory(fs);
+        Directory destDir = linkPath.getDirectory(fs);
 
-        int index = linkTarget.lastIndexOf(Path.PATH_SEPARATOR);
-
-        if (index != -1) {
-            dir = Path.parseDirectory(fs, linkTarget.substring(0, index + 1));
-            linkTarget = linkTarget.substring(index + 1);
-        }
-
-        Iterator it = dir.getIterator();
-
-        FileSystemItem target = dir.findItem(linkTarget);
+        FileSystemItem target = srcDir.findItem(linkTargetPath.getItemName());
         if (target != null) {
-            target.createLink(linkName);
+            target.createLink(destDir, linkPath.getItemName());
             return;
         }
         throw new FileSystemException("Item not found");
-
-        //fs.getCurrentDirectory().createLink(new Path(String)param[1]);
     }
 
     public String help(boolean briefOnly) {
