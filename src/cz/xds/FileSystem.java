@@ -27,8 +27,8 @@ public class FileSystem {
      * Tovarna pro vyrobu souborovych systemu
      *
      * @param commandFile Soubor s prikazy, ktere ma system pouzivat pro praci
-     * @param in Vstupni stream
-     * @param out Stream, na ktery bude smerovan veskery vystup
+     * @param in          Vstupni stream
+     * @param out         Stream, na ktery bude smerovan veskery vystup
      * @return Vytvoreny novy objekt FileSystem
      * @throws IOException
      */
@@ -58,6 +58,7 @@ public class FileSystem {
 
     /**
      * Nastavi aktualni adresar
+     *
      * @param d Novy aktualni adresar
      */
     public void changeDirectory(Directory d) {
@@ -66,6 +67,7 @@ public class FileSystem {
 
     /**
      * Vraci aktualni adresar
+     *
      * @return Aktualni adresar
      */
     public Directory getCurrentDirectory() {
@@ -76,6 +78,7 @@ public class FileSystem {
      * Vraci ukazatel na korenovy adresar (vsechny polozky v systemu jsou jeho primymi
      * nebo neprimymi potomky). Nikdy nevraci null, protoze korenovy adresar existuje
      * i u prazdneho souboroveho systemu.
+     *
      * @return Ukazatel na korenovy adresar
      */
     public Directory getRootDirectory() {
@@ -133,6 +136,7 @@ public class FileSystem {
 
     /**
      * Provede zadany prikaz
+     *
      * @param params Vektor parametru nactenych napr. ze vstupniho streamu
      * @throws FileSystemException
      */
@@ -145,6 +149,7 @@ public class FileSystem {
      * Jakysi pokus o emulaci konzoly pro praci se souborovym systemem. Da se prirovnat
      * k shellu UNIXu (ovsem velmi zjednodusenemu). V cyklu se zde vypisuje prompt,
      * ceka na prikaz, ktery se pote provede. Vysledek je smerovan na vystupni stream.
+     *
      * @throws IOException
      */
     public void getPrompt() throws IOException {
@@ -161,7 +166,9 @@ public class FileSystem {
 
             if (inner instanceof FileSystemException) {
                 if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
-                    System.exit(0);
+                    input.close();
+                    output.close();
+                    //System.exit(0);
                 }
                 output.println(inner.getMessage());
             } else {
