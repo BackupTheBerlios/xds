@@ -17,14 +17,21 @@ public class FileSystem {
     private ClassLoader cl;
     protected BufferedReader input;
     protected PrintStream output;
-    //protected IDFactory idFactory = ;
 
     protected FileSystem(Directory root) {
-        //root.idFactory = idFactory;
         this.root = root;
         this.aktDir = root;
     }
 
+    /**
+     * Tovarna pro vyrobu souborovych systemu
+     *
+     * @param commandFile Soubor s prikazy, ktere ma system pouzivat pro praci
+     * @param in Vstupni stream
+     * @param out Stream, na ktery bude smerovan veskery vystup
+     * @return Vytvoreny novy objekt FileSystem
+     * @throws IOException
+     */
     public static FileSystem createFileSystem(java.io.File commandFile, InputStream in, PrintStream out) throws IOException {
         FileSystem fs = new FileSystem(new Directory(new IDFactory()));
         fs.input = new BufferedReader(new InputStreamReader(in));
@@ -33,6 +40,12 @@ public class FileSystem {
         return fs;
     }
 
+    /**
+     * Nacte ze vstupniho streamu prikaz
+     *
+     * @return Vektor parametru
+     * @throws IOException
+     */
     protected Vector getCommand() throws IOException {
         StringTokenizer st = new StringTokenizer(input.readLine());
         Vector retVal = new Vector();
@@ -43,14 +56,28 @@ public class FileSystem {
         return retVal;
     }
 
+    /**
+     * Nastavi aktualni adresar
+     * @param d Novy aktualni adresar
+     */
     public void changeDirectory(Directory d) {
         aktDir = d;
     }
 
+    /**
+     * Vraci aktualni adresar
+     * @return Aktualni adresar
+     */
     public Directory getCurrentDirectory() {
         return aktDir;
     }
 
+    /**
+     * Vraci ukazatel na korenovy adresar (vsechny polozky v systemu jsou jeho primymi
+     * nebo neprimymi potomky). Nikdy nevraci null, protoze korenovy adresar existuje
+     * i u prazdneho souboroveho systemu.
+     * @return Ukazatel na korenovy adresar
+     */
     public Directory getRootDirectory() {
         return root;
     }
@@ -97,15 +124,29 @@ public class FileSystem {
 
     private Command ex = (Command) Proxy.newProxyInstance(Command.class.getClassLoader(), new Class[]{Command.class}, handler);
 
+    /**
+     * Vypise dotazovaci retezec, tzv. prompt
+     */
     protected void printPrompt() {
         output.print("XDS:" + aktDir.getFullPath() + ">");
     }
 
+    /**
+     * Provede zadany prikaz
+     * @param params Vektor parametru nactenych napr. ze vstupniho streamu
+     * @throws FileSystemException
+     */
     protected void dispatchCommand(Vector params) throws FileSystemException {
         if (params.size() > 0)
             ex.execute(this, output, params.toArray());
     }
 
+    /**
+     * Jakysi pokus o emulaci konzoly pro praci se souborovym systemem. Da se prirovnat
+     * k shellu UNIXu (ovsem velmi zjednodusenemu). V cyklu se zde vypisuje prompt,
+     * ceka na prikaz, ktery se pote provede. Vysledek je smerovan na vystupni stream.
+     * @throws IOException
+     */
     public void getPrompt() throws IOException {
         printPrompt();
         Vector comm = getCommand();

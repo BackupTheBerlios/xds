@@ -9,9 +9,15 @@ import java.util.Vector;
  */
 public class Path {
     Vector path = null;
-    public static final String PATH_SEPARATOR = "/";
     String directory, itemName;
 
+    // Oddelovac adresaru v kompletni ceste
+    public static final String PATH_SEPARATOR = "/";
+
+    /**
+     * Konstruktor pro sestaveni cesty od korenoveho adresare k jiz existujici polozce
+     * @param fsi Polozka, jejiz cesta se ma sestavit
+     */
     public Path(FileSystemItem fsi) {
         path = new Vector();
 
@@ -25,6 +31,13 @@ public class Path {
         }
     }
 
+    /**
+     * Konstruktor sestavujici cestu ze zadane cesty a parametru, zda posledni
+     * polozka v ceste musi byt adresar, nebo na ni vubec nezalezi.
+     * @param fullPath Retezec reprezentujici cestu k polozce
+     * @param isOnlyDirectory Musi byt posledni polozka (tj. text za poslednim <i>Path.SEPARATOR</i>
+     * ) cesty adresar?
+     */
     public Path(String fullPath, boolean isOnlyDirectory) {
         if (isOnlyDirectory)
         {
@@ -42,21 +55,47 @@ public class Path {
             itemName = fullPath;
     }
 
+    /**
+     * Vraci adresar cesty
+     * @return Retezec reprezentujici adresar polozky specifikovane v konstruktoru Path
+     */
     public String getDirectory() {
         return directory;
     }
 
+    /**
+     * Vraci nazev polozky (jmena, adresare nebo odkazu)
+     * @return Nazev polozky
+     */
     public String getItemName() {
         return itemName;
     }
+
+    /**
+     * Vraci vektor jednotlivych adresaru smerem od cilove polozky do korenoveho adresare
+     * @return Vektor objektu Directory s polozkami cesty
+     */
     public Vector getPath() {
         return path;
     }
 
+    /**
+     * Prelozi textovou reprezentaci cesty na objekt Directory (pokud tento existuje)
+     * @param fs Souborovy system, ktery se ma pro preklad pouzit
+     * @return Vysledny adresar
+     * @throws FileSystemException Pokud polozka neexistuje
+     */
     public Directory getDirectory(FileSystem fs) throws FileSystemException {
         return directory == null ? fs.getCurrentDirectory() : parseDirectory(fs, directory);
     }
 
+    /**
+     * Prelozi adresar reprezentovany cestou na objekt typu Directory
+     * @param fs Souborovy system, ktery se ma pro preklad pouzit
+     * @param path Cesta pro preklad
+     * @return Vysledny adresar
+     * @throws FileSystemException Pokud neni adresar nalezen
+     */
     public static Directory parseDirectory(FileSystem fs, String path) throws FileSystemException {
         Directory workDir;
 
