@@ -8,6 +8,7 @@ import java.util.Iterator;
  */
 public class Path {
     Vector path;
+    public static final String PATH_SEPARATOR = "/";
 
     public Path(FileSystemItem fsi) {
         path = new Vector();
@@ -30,7 +31,7 @@ public class Path {
         int size = path.size();
         for (int i = (size-1); i >= 0; i--) {
             Directory d = (Directory)path.elementAt(i);
-            sb.append(d.getName()).append("\\");
+            sb.append(d.getName()).append(PATH_SEPARATOR);
         }
         return sb.toString();
     }
