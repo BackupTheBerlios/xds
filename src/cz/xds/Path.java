@@ -8,14 +8,15 @@ import java.util.Vector;
  * Cesta v souborovem systemu
  */
 public class Path {
-    Vector path = null;
-    String directory, itemName;
+    protected Vector path = null;
+    protected String directory, itemName;
 
     // Oddelovac adresaru v kompletni ceste
     public static final String PATH_SEPARATOR = "/";
 
     /**
      * Konstruktor pro sestaveni cesty od korenoveho adresare k jiz existujici polozce
+     *
      * @param fsi Polozka, jejiz cesta se ma sestavit
      */
     public Path(FileSystemItem fsi) {
@@ -34,13 +35,13 @@ public class Path {
     /**
      * Konstruktor sestavujici cestu ze zadane cesty a parametru, zda posledni
      * polozka v ceste musi byt adresar, nebo na ni vubec nezalezi.
-     * @param fullPath Retezec reprezentujici cestu k polozce
+     *
+     * @param fullPath        Retezec reprezentujici cestu k polozce
      * @param isOnlyDirectory Musi byt posledni polozka (tj. text za poslednim <i>Path.SEPARATOR</i>
-     * ) cesty adresar?
+     *                        ) cesty adresar?
      */
     public Path(String fullPath, boolean isOnlyDirectory) {
-        if (isOnlyDirectory)
-        {
+        if (isOnlyDirectory) {
             directory = fullPath;
             return;
         }
@@ -50,13 +51,13 @@ public class Path {
         if (index != -1) {
             directory = fullPath.substring(0, index + 1);
             itemName = fullPath.substring(index + 1);
-        }
-        else
+        } else
             itemName = fullPath;
     }
 
     /**
      * Vraci adresar cesty
+     *
      * @return Retezec reprezentujici adresar polozky specifikovane v konstruktoru Path
      */
     public String getDirectory() {
@@ -65,6 +66,7 @@ public class Path {
 
     /**
      * Vraci nazev polozky (jmena, adresare nebo odkazu)
+     *
      * @return Nazev polozky
      */
     public String getItemName() {
@@ -73,6 +75,7 @@ public class Path {
 
     /**
      * Vraci vektor jednotlivych adresaru smerem od cilove polozky do korenoveho adresare
+     *
      * @return Vektor objektu Directory s polozkami cesty
      */
     public Vector getPath() {
@@ -81,6 +84,7 @@ public class Path {
 
     /**
      * Prelozi textovou reprezentaci cesty na objekt Directory (pokud tento existuje)
+     *
      * @param fs Souborovy system, ktery se ma pro preklad pouzit
      * @return Vysledny adresar
      * @throws FileSystemException Pokud polozka neexistuje
@@ -91,7 +95,8 @@ public class Path {
 
     /**
      * Prelozi adresar reprezentovany cestou na objekt typu Directory
-     * @param fs Souborovy system, ktery se ma pro preklad pouzit
+     *
+     * @param fs   Souborovy system, ktery se ma pro preklad pouzit
      * @param path Cesta pro preklad
      * @return Vysledny adresar
      * @throws FileSystemException Pokud neni adresar nalezen
@@ -121,8 +126,8 @@ public class Path {
                     if (fsi instanceof Directory) {
                         workDir = (Directory) fsi;
                         continue start;
-                    } else if (fsi instanceof Link && (((Link)fsi).getTarget() instanceof Directory)) {
-                        workDir = (Directory)((Link)fsi).getTarget();
+                    } else if (fsi instanceof Link && (((Link) fsi).getTarget() instanceof Directory)) {
+                        workDir = (Directory) ((Link) fsi).getTarget();
                         continue start;
                     }
 
@@ -147,8 +152,7 @@ public class Path {
                     sb.append(PATH_SEPARATOR);
             }
             return sb.toString();
-        }
-        else
+        } else
             return directory + itemName;
     }
 }

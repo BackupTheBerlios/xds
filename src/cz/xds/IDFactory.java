@@ -36,7 +36,7 @@ public class IDFactory {
      *
      * @return Nejnizsi volny slot (id)
      */
-    private long findFreeID() {
+    protected long findFreeID() {
         long maxId = -1;
 
         // Tiger tamed :-)
