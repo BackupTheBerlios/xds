@@ -21,10 +21,9 @@ public class File extends FileSystemItem {
     }
 
     public void delete() throws FileSystemException {
-        parent.delete(this);
         data = null;
-        
-        removeLinks();
+
+        super.delete();
     }
 
     public void copy(Directory d) throws FileSystemException {

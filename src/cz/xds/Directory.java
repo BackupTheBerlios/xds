@@ -73,18 +73,15 @@ public class Directory extends FileSystemItem implements Browseable {
                 fsi.delete();
             }
         }
-        else
-            removeLinks();
-
-        parent.delete(this);
 
         children = null;
-        links = null;
+        
+        super.delete();
     }
 
     public void delete(FileSystemItem fsi) throws FileSystemException {
-        //if (attributes.isReadOnly())
-        //    throw new FileSystemException("Protected");
+        if (attributes.isReadOnly())
+            throw new AccessException(name);
 
         children.remove(fsi);
     }

@@ -12,9 +12,14 @@ public class Attributes {
      * @param isHidden parametr hidden
      * @param isReadOnly parametr readOnly
      */
-    Attributes(boolean isHidden, boolean isReadOnly) {
+    public Attributes(boolean isHidden, boolean isReadOnly) {
         this.isHidden = isHidden;
         this.isReadOnly = isReadOnly;
+    }
+
+    public Attributes(String attrString) {
+        isReadOnly = attrString.toLowerCase().indexOf('r') != -1;
+        isHidden = attrString.toLowerCase().indexOf('h') != -1;
     }
 
     /**
@@ -47,5 +52,13 @@ public class Attributes {
      */
     public void setReadOnly(boolean isReadOnly) {
         this.isReadOnly = isReadOnly;
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append(isReadOnly ? "r" : "-").append(isHidden ? "h" : "-");
+
+        return sb.toString();
     }
 }

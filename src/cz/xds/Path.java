@@ -2,6 +2,7 @@ package cz.xds;
 
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
     Cesta v souborovem systemu
@@ -9,6 +10,8 @@ import java.util.Iterator;
 public class Path {
     Vector path;
     public static final String PATH_SEPARATOR = "/";
+
+    //TODO: make a nice parser, wildcards/regexp checker etc.
 
     public Path(FileSystemItem fsi) {
         path = new Vector();

@@ -12,7 +12,7 @@ public class FileSystem {
 
     private Directory root;
     private Directory aktDir;
-    protected BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    protected BufferedReader br = new BufferedReader(new InputStreamReader(System.in));     // TODO: read from socket?
 
     protected FileSystem(Directory root) {
         this.root = root;
@@ -86,6 +86,7 @@ public class FileSystem {
             while ((inner.getCause()) != null) {
                 inner = inner.getCause();
             }
+            //TODO: more somphisticated system exception dump?
             if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
                 System.exit(0);
             }

@@ -7,7 +7,7 @@ import java.util.Vector;
  */
 public abstract class FileSystemItem {
     protected String name;
-    protected Attributes attributes;
+    protected Attributes attributes = new Attributes();
     protected long id;
     protected Directory parent;
     protected Vector links = new Vector();
@@ -18,6 +18,10 @@ public abstract class FileSystemItem {
 
     public Attributes getAttributes() {
         return attributes;
+    }
+
+    public void setAttributes(Attributes newAttr) {
+        attributes = newAttr;
     }
 
     public long getId() {
@@ -53,17 +57,27 @@ public abstract class FileSystemItem {
 
     public abstract Link createLink(String name) throws FileSystemException;
 
-    public abstract void delete() throws FileSystemException;
-
     public abstract void copy(Directory d) throws FileSystemException;
 
     public abstract void move(Directory d) throws FileSystemException;
+
+    public void delete() throws FileSystemException {
+        if (attributes.isReadOnly())
+            throw new AccessException(name);
+
+        parent.delete(this);
+
+        if (!(this instanceof Link))
+            removeLinks();
+
+        links = null;
+    }
 
     public String toString() {
         StringBuffer sb = new StringBuffer();
 
         sb.append((this instanceof Link) ? "*" : ((this instanceof Directory) ? "D" : " "));
-        sb.append(" ").append(name).append(" (").append(id).append(")");
+        sb.append(" ").append(attributes).append(" ").append(name).append(" (").append(id).append(")");
 
         if (this instanceof Link) {
             FileSystemItem target = ((Link)this).getTarget();
