@@ -1,9 +1,6 @@
 package cz.xds;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -17,22 +14,25 @@ public class FileSystem {
 
     private Directory root;
     private Directory aktDir;
-    protected BufferedReader br = new BufferedReader(new InputStreamReader(System.in));     // TODO: read from socket?
+    protected BufferedReader input;
+    protected PrintStream output;
 
     protected FileSystem(Directory root) {
         this.root = root;
         this.aktDir = root;
     }
 
-    public static FileSystem createFileSystem() {
+    public static FileSystem createFileSystem(InputStream in, PrintStream out) {
         Attributes at = new Attributes(false, false);
         Directory d = new Directory(Path.PATH_SEPARATOR, null, at);
         FileSystem fs = new FileSystem(d);
+        fs.input = new BufferedReader(new InputStreamReader(in));
+        fs.output = out;
         return fs;
     }
 
     protected Vector getCommand() throws IOException {
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        StringTokenizer st = new StringTokenizer(input.readLine());
         Vector retVal = new Vector();
 
         while (st.hasMoreTokens())
@@ -101,12 +101,12 @@ public class FileSystem {
     private Command ex = (Command) Proxy.newProxyInstance(Command.class.getClassLoader(), new Class[]{Command.class}, handler);
 
     protected void printPrompt() {
-        System.out.print("XDS:" + aktDir.getFullPath() + ">");
+        output.print("XDS:" + aktDir.getFullPath() + ">");
     }
 
     protected void dispatchCommand(Vector params) throws FileSystemException {
         if (params.size() > 0)
-            ex.execute(this, System.out, params.toArray());
+            ex.execute(this, output, params.toArray());
     }
 
     public void getPrompt() throws IOException {
@@ -125,9 +125,9 @@ public class FileSystem {
                 if (inner.getMessage() != null && inner.getMessage().equals("exit")) {
                     System.exit(0);
                 }
-                System.out.println(inner.getMessage());
+                output.println(inner.getMessage());
             } else {
-                System.out.println("Internal error: " + inner.getClass().getName());
+                output.println("Internal error: " + inner.getClass().getName());
             }
         }
     }

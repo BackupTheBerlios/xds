@@ -1,14 +1,14 @@
 package cz.xds;
 
 /**
-    Testovaci trida
+ * Testovaci trida
  */
 public class TestClass {
     public static void main(String[] args) {
         try {
-            FileSystem fs = FileSystem.createFileSystem();
-            while(true) {
-            fs.getPrompt();
+            FileSystem fs = FileSystem.createFileSystem(System.in, System.out);
+            while (true) {
+                fs.getPrompt();
             }
         } catch (Exception e) {
             e.printStackTrace();
