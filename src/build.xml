@@ -11,30 +11,30 @@
 
     <target name="compile">
         <mkdir dir="${dest}/temp"/>
-        <javac srcdir="${src}" destdir="${dest}"/>
+        <javac srcdir="${src}" destdir="${dest}/temp"/>
 
-        <jar destfile="${dest}/temp/${destJar}" basedir="${dest}" includes="cz/xds/**" excludes="cz/xds/command/**">
+        <jar destfile="${dest}/${destJar}" basedir="${dest}/temp" includes="cz/xds/**" excludes="cz/xds/command/**">
             <manifest>
                 <attribute name="Main-Class" value="cz.xds.TestClass"/>
             </manifest>
         </jar>
 
-        <zip destfile="${dest}/${commandZip}" basedir="${dest}/cz/xds/command"/>
+        <zip destfile="${dest}/${commandZip}" basedir="${dest}/temp/cz/xds/command"/>
         <delete dir="${dest}/temp"/>
     </target>
 
     <target name="junit" depends="compile">
-	    <junit printsummary="on" showoutput="true">
-            <classpath path="${dest}"/>
-	        <formatter type="brief" usefile="false"/>
+        <junit printsummary="on" showoutput="true">
+            <classpath path="${dest}/xds.jar"/>
+            <formatter type="brief" usefile="false"/>
 
-	        <batchtest>
-	            <fileset dir="${src}">
+            <batchtest>
+                <fileset dir="${src}">
                     <include name="**/TestFile.java"/>
-	            </fileset>
-	        </batchtest>
-	    </junit>
- 	</target>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
 
 </project>
 
