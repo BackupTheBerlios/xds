@@ -12,39 +12,43 @@ public class IDFactory {
 
     /**
      * Najde slot pro nove id a vrati jej
+     *
      * @param i Nove vytvarena polozka
      * @return
      */
     public long createNewID(FileSystemItem i) {
         long key = findFreeID();
 
-        ids.put(key, i);
+        ids.put(new Long(key), i);
         return key;
     }
 
     /**
      * Vymazani daneho id z mapy
+     *
      * @param id id pro vymaz
      */
     public void deleteID(long id) {
-        ids.remove(id);
+        ids.remove(new Long(id));
     }
 
     /**
      * Nalezne nejnizsi volne id a vrati jej
+     *
      * @return Nejnizsi volny slot (id)
      */
     private long findFreeID() {
         long maxId = -1;
 
         // Tiger tamed :-)
-        for (Object o: ids.keySet()) {
-            long i = ((Long)o).longValue();
+        java.util.Iterator it = ids.keySet().iterator();
+        while (it.hasNext()) {
+            long i = ((Long) it.next()).longValue();
 
             if (i > maxId)
                 maxId = i;
         }
 
-        return maxId+1;
+        return maxId + 1;
     }
 }
