@@ -68,15 +68,19 @@ public abstract class FileSystemItem {
     }
 
     public void delete() throws FileSystemException {
-        if (attributes.isReadOnly())
-            throw new AccessException(name);
+        checkDeletable();
 
         parent.delete(this);
 
         if (!(this instanceof Link))
             removeLinks();
 
-        links = null;
+        //links = null;
+    }
+
+    public void checkDeletable() throws AccessException {
+        if (attributes.isReadOnly())
+            throw new AccessException(name);
     }
 
     public String toString() {

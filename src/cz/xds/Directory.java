@@ -64,14 +64,17 @@ public class Directory extends FileSystemItem implements Browseable {
     }
 
     public void delete() throws FileSystemException {
+        checkDeletable();
+
         if (links.size() == 0) {
             while (children.size() > 0) {
                 FileSystemItem fsi = (FileSystemItem) children.firstElement();
                 fsi.delete();
             }
         }
-        children = null;
 
+        children = null;
+        
         super.delete();
     }
 

@@ -22,9 +22,9 @@ public class Link extends FileSystemItem {
     }
 
     public void delete() throws FileSystemException {
-        target.delete();
-
         super.delete();
+
+        target.delete();
     }
 
     public void copy(Directory d) throws FileSystemException {
