@@ -30,7 +30,7 @@ public class Link extends FileSystemItem {
     }
 
     protected Object clone() {
-        Link newLink = new Link(target, null, name);
+        Link newLink = new Link(target, parent, name);
 
         target.addLink(newLink);
 

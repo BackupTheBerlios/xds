@@ -216,7 +216,7 @@ public class Directory extends FileSystemItem implements Browseable {
      * @return
      */
     protected Object clone() {
-        Directory newDir = new Directory(name, null, attributes);
+        Directory newDir = new Directory(name, parent, attributes);
 
         // rekurzivne zkopirovat vsechny podslozky a soubory
 
