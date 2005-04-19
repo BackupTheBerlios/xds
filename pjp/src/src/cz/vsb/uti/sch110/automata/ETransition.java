@@ -4,6 +4,7 @@ import cz.vsb.uti.sch110.automata.AutomatException;
 
 /**
     Tøída pøedstavuje E pøechod nedeterministického automatu
+    pacham!
  */
 public class ETransition extends Transition {
     /**
