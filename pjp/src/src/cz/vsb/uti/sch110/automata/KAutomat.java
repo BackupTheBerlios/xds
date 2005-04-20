@@ -6,11 +6,12 @@ import cz.vsb.uti.sch110.automata.AutomatException;
 import java.util.*;
 
 /**
-    Deterministický automat
+ * Deterministický automat
  */
 public class KAutomat extends AbstractAutomat {
     /**
      * Základní konstruktor
+     *
      * @param charset abeceda
      */
     public KAutomat(char[] charset) {
@@ -19,6 +20,7 @@ public class KAutomat extends AbstractAutomat {
 
     /**
      * Nastaví startovací stav. Lze nastavit pouze jeden
+     *
      * @param n
      * @throws AutomatException
      */
@@ -27,6 +29,14 @@ public class KAutomat extends AbstractAutomat {
             throw new AutomatException("KA can have only one start state");
         else
             super.setStarting(n);
+    }
+
+    public Node getStartingNode() {
+        Iterator i = start.iterator();
+        if (i.hasNext())
+            return (Node) i.next();
+        else
+            return null;
     }
 
     /**
@@ -57,7 +67,8 @@ public class KAutomat extends AbstractAutomat {
 
     /**
      * Nalezne následující stav
-     * @param act Poèáteèní stav
+     *
+     * @param act  Poèáteèní stav
      * @param znak Pøechodový znak
      * @return následující stav
      */
@@ -70,11 +81,19 @@ public class KAutomat extends AbstractAutomat {
 
     /**
      * Zkontroluje, zda dané slovo je automatem pøijato èi nikoliv
+     *
      * @param word Zkoumané slovo
      * @return True, pokud automat slovo pøijme, jinak false
      * @throws AutomatException
      */
     public boolean checkWord(String word) throws AutomatException {
+        if (end.contains(getNodeAfter(word)))
+            return true;
+        else
+            return false;
+    }
+
+    public Node getNodeAfter(String word) throws AutomatException {
         Iterator it = start.iterator();
         Node n;
         if (it.hasNext()) {
@@ -104,9 +123,9 @@ public class KAutomat extends AbstractAutomat {
         }
         while (!v.isEmpty()) {
             n = (Node) v.remove(0);
-            if (end.contains(n)) return true;
+            return n;
         }
-        return false;
+        return null;
     }
 
     public boolean verify() {

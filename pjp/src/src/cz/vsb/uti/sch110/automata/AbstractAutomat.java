@@ -3,7 +3,7 @@ package cz.vsb.uti.sch110.automata;
 import java.util.*;
 
 /**
-Obecná implementace automatu
+ * Obecná implementace automatu
  */
 public abstract class AbstractAutomat {
     /**
@@ -33,9 +33,11 @@ public abstract class AbstractAutomat {
 
     /**
      * Pøidává nový stav
+     *
      * @param n stav
      * @return Vrací true, pokud byl stav úspì¹nì pøidán
-     * @throws cz.vsb.uti.sch110.automata.AutomatException Pokud ji¾ existuje stav se stejným názvem
+     * @throws cz.vsb.uti.sch110.automata.AutomatException
+     *          Pokud ji¾ existuje stav se stejným názvem
      */
     public boolean addNode(Node n) throws AutomatException {
         if (!nodes.contains(n))
@@ -46,6 +48,7 @@ public abstract class AbstractAutomat {
 
     /**
      * Vrací stav se zadaným názvem
+     *
      * @param s název
      * @return
      */
@@ -62,6 +65,7 @@ public abstract class AbstractAutomat {
 
     /**
      * Oznaèí stav jako startovací
+     *
      * @param n
      * @throws AutomatException Pokud stav neexistuje
      */
@@ -75,6 +79,7 @@ public abstract class AbstractAutomat {
 
     /**
      * Vraci true, pokud mnozina obsahuje alespon jeden akceptujici stav
+     *
      * @param s
      * @return
      */
@@ -82,7 +87,7 @@ public abstract class AbstractAutomat {
         Node n;
         Iterator i = s.iterator();
         while (i.hasNext()) {
-            n = (Node)i.next();
+            n = (Node) i.next();
             if (end.contains(n)) return true;
         }
         return false;
@@ -90,16 +95,20 @@ public abstract class AbstractAutomat {
 
     /**
      * Odznaèí stav jako startovací
+     *
      * @param n
      * @throws AutomatException Pokud stav neexistuje
      */
     public void unsetStarting(Node n) throws AutomatException {
-        if (start.contains(n)) start.remove(n);
-        else throw new AutomatException("Trying to unset non existing state");
+        if (start.contains(n))
+            start.remove(n);
+        else
+            throw new AutomatException("Trying to unset non existing state");
     }
 
     /**
      * Nastaví stav n jako pøijímací
+     *
      * @param n
      * @throws AutomatException Pokud stav neexistuje - je tøeba jej nejdøíve pøidat
      */
@@ -113,16 +122,20 @@ public abstract class AbstractAutomat {
 
     /**
      * Odznaèí stav jako pøijímací
+     *
      * @param n Stav
      * @throws AutomatException Pokud automat ¾ádný stav n neobsahuje
      */
     public void unsetAccepting(Node n) throws AutomatException {
-        if (end.contains(n)) end.remove(n);
-        else throw new AutomatException("Trying to unset non existing state");
+        if (end.contains(n))
+            end.remove(n);
+        else
+            throw new AutomatException("Trying to unset non existing state");
     }
 
     /**
      * Výpis ve formátu dle http://www.cs.vsb.cz/hlineny/vyuka/UTI-referaty/UTI-autpr1.html
+     *
      * @return
      */
     public String toString() {
@@ -157,13 +170,13 @@ public abstract class AbstractAutomat {
             sb.append(v.get(j)).append(" ");
         }
         v.removeAllElements();
-        
+
         sb.append("\n");
         Iterator i = nodes.iterator();
         Node tmp;
         Collection tmpcol;
         while (i.hasNext()) {
-            tmp = (Node)i.next();
+            tmp = (Node) i.next();
             tmpcol = tmp.transitions;
             Iterator it = tmpcol.iterator();
             while (it.hasNext()) {
@@ -179,6 +192,7 @@ public abstract class AbstractAutomat {
 
     /**
      * Vrací true, pokud automat dané slovo pøijme, jinak false
+     *
      * @param word
      * @return
      * @throws AutomatException
@@ -187,13 +201,15 @@ public abstract class AbstractAutomat {
 
     /**
      * Ovìøuje korektnost automatu
+     *
      * @return True v pøípadì, ¾e je automat v poøádku, jinak false
      */
     public abstract boolean verify();
 
     /**
      * Vrací mno¾inu v¹ech stavù dostupných ze stavù ve vlo¾ené mno¾inì konkrétním znakem
-     * @param act Mno¾ina, ze které se má prohledávat
+     *
+     * @param act  Mno¾ina, ze které se má prohledávat
      * @param znak Pøechodový znak
      * @return Mno¾ina dostupných stavù
      */

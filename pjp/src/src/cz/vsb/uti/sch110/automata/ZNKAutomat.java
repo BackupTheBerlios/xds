@@ -5,7 +5,7 @@ import cz.vsb.uti.sch110.automata.*;
 import java.util.*;
 
 /**
-    Nedeterministický automat
+ * Nedeterministický automat
  */
 public class ZNKAutomat extends AbstractAutomat {
     public ZNKAutomat(char[] charset) {
@@ -47,7 +47,8 @@ public class ZNKAutomat extends AbstractAutomat {
 
     /**
      * Vraci vector vsech stavu dosazitelnych ze startovnich pomoci E prechodu
-      * @return
+     *
+     * @return
      * @throws AutomatException
      */
     private Vector findStartingNodes() throws AutomatException {
@@ -73,6 +74,7 @@ public class ZNKAutomat extends AbstractAutomat {
 
     /**
      * Vrací odpovídající deterministický automat v normovaném tvaru
+     *
      * @return
      * @throws AutomatException
      */
@@ -102,16 +104,16 @@ public class ZNKAutomat extends AbstractAutomat {
         return kat;
     }
 
-    private int nextNum = 1;
+    protected int nextNum = 1;
+
     /**
-     *
-     * @param newPoints Mapování podmno¾iny stavù ZNKA na jeden stav KA
-     * @param kat Nový automat
-     * @param aktualSet Aktuální mno¾ina stavù u které zkoumáme, kam se lze dostat
+     * @param newPoints  Mapování podmno¾iny stavù ZNKA na jeden stav KA
+     * @param kat        Nový automat
+     * @param aktualSet  Aktuální mno¾ina stavù u které zkoumáme, kam se lze dostat
      * @param aktualNode Stav v KA odpovídající aktualSet (¹el by získat i z newPoints)
      * @throws AutomatException
      */
-    private void followNodes(Map newPoints, KAutomat kat, Set aktualSet, Node aktualNode) throws AutomatException {
+    protected void followNodes(Map newPoints, KAutomat kat, Set aktualSet, Node aktualNode) throws AutomatException {
         Set tmp;
         Node node;
 
