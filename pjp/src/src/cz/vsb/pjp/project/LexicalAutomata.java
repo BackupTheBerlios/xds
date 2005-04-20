@@ -42,6 +42,18 @@ public class LexicalAutomata {
             return false;
     }
 
+    public Symbol getSymbolPushBack() throws AutomatException {
+        sb.deleteCharAt(sb.length() - 1);
+        Node n = ka.getNodeAfter(sb.toString());
+        Symbol s = null;
+        if (n instanceof SymbolNode) {
+            s = ((SymbolNode) n).getSymbol();
+            s.setAtt(sb.toString());
+        }
+        clearString();
+        return s;
+    }
+
     public String toString() {
         return ka.toString();
     }
@@ -51,20 +63,20 @@ public class LexicalAutomata {
             char[] charset = new String("abcd10").toCharArray();
             KAutomat ka = new KAutomat(charset);
             Node a = new Node("0");
-            Node b = new SymbolNode("1", new Symbol());
+            Node b = new SymbolNode("1", new Symbol("ident"));
             a.addTransition(new Transition('a', b));
+            a.addTransition(new Transition('b', a));
             b.addTransition(new Transition('a', a));
+            b.addTransition(new Transition('b', b));
             ka.addNode(a);
             ka.addNode(b);
             ka.setStarting(a);
 
             KAutomat ka2 = new KAutomat(charset);
             a = new Node("2");
-            b = new SymbolNode("3", new Symbol());
+            b = new SymbolNode("3", new Symbol("num"));
             a.addTransition(new Transition('1', b));
-            a.addTransition(new Transition('0', a));
-            b.addTransition(new Transition('1', b));
-            b.addTransition(new Transition('0', a));
+            b.addTransition(new Transition('0', b));
             ka2.addNode(a);
             ka2.addNode(b);
             ka2.setStarting(a);
@@ -76,14 +88,22 @@ public class LexicalAutomata {
             LexicalAutomata la = new LexicalAutomata(new String("abcd10").toCharArray(), data);
             //System.out.println(la);
 
-            String s = "aaaaa";
+            String s = "a1000001aaa11abbbbbaa110a";
+            boolean found = false;
+            int cycle = 0;
+
             for (int i = 0; i < s.length(); i++) {
-                System.out.println(s.substring(0, i + 1) + " - " + la.addChar(s.charAt(i)));
-            }
-            la.clearString();
-            s = "0000011101";
-            for (int i = 0; i < s.length(); i++) {
-                System.out.println(s.substring(0, i + 1) + " - " + la.addChar(s.charAt(i)));
+                cycle++;
+                if (la.addChar(s.charAt(i))) {
+                    found = true;
+                    cycle = 0;
+                } else if (found == true) {
+                    found = false;
+                    i--;
+                    Symbol sym = la.getSymbolPushBack();
+                    if (sym != null) System.out.println(sym.getName() + " - " + sym.getAtt());
+                } else
+                    System.out.println("Error - " + cycle);
             }
         } catch (AutomatException e) {
             e.printStackTrace();
