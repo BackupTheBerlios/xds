@@ -121,8 +121,8 @@ public class LexicalAutomata {
     public static void main(String[] args) {
         try {
 
-            InputStream in = new FileInputStream("c:\\test.txt");
-            InputStream data = new FileInputStream("c:\\data.txt");
+            InputStream in = new FileInputStream("src//rules.lex");
+            InputStream data = new FileInputStream("src//data.txt");
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
             la.setSource(data);
 
