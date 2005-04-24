@@ -2,21 +2,18 @@ package cz.vsb.pjp.project;
 
 import cz.vsb.uti.sch110.automata.*;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.Iterator;
+import java.util.*;
+import java.io.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: vsch
- * Date: 20.4.2005
- * Time: 15:45:26
- * To change this template use File | Settings | File Templates.
+ * @author Vladimir Schafer - 20.4.2005 - 15:45:26
  */
 public class LexicalAutomata {
 
     private KAutomat ka;
     private StringBuffer sb = new StringBuffer();
+    private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private LinkedList<Symbol> fronta = new LinkedList<Symbol>();
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
@@ -29,11 +26,65 @@ public class LexicalAutomata {
         ka = zn.convertToKA();
     }
 
-    public void clearString() {
-        sb.delete(0, sb.length());
+    protected void clearString() {
+
     }
 
-    public boolean addChar(char a) throws AutomatException {
+    public void setSource(InputStream r) {
+        br = new BufferedReader(new InputStreamReader(r));
+    }
+
+    public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
+        fillQueue();
+        if (fronta.size() == 0) throw new NoMoreTokensException();
+        return fronta.poll();
+    }
+
+    public boolean hasTokens() throws IOException, AutomatException {
+        fillQueue();
+        return fronta.size() > 0;
+    }
+
+    private void fillQueue() throws IOException, AutomatException {
+        if (fronta.size() > 0) return;
+        StringBuffer tmp = new StringBuffer();
+        while (fronta.size() == 0) {
+            boolean found = false;
+            char act;
+
+            String next = br.readLine();
+            if (next != null)
+                tmp.append(next);
+            else
+                return;
+
+            for (int i = 0; i < tmp.length(); i++) {
+                act = tmp.charAt(i);
+                if (Character.isWhitespace(act)) {
+                    if (found == true) {
+                        found = false;
+                        Symbol sym = getSymbol();
+                        if (sym != null) fronta.add(sym);
+                    }
+                    continue;
+                }
+
+                if (addChar(act)) {
+                    found = true;
+                } else if (found == true) {
+                    found = false;
+                    i--;
+                    fronta.add(getPushBackSymbol());
+                }
+            }
+            if (found == true) {
+                fronta.add(getSymbol());
+            }
+            tmp.delete(0, sb.length());
+        }
+    }
+
+    protected boolean addChar(char a) throws AutomatException {
         sb.append(a);
         Node n = ka.getNodeAfter(sb.toString());
         if (n instanceof SymbolNode)
@@ -42,15 +93,24 @@ public class LexicalAutomata {
             return false;
     }
 
-    public Symbol getSymbolPushBack() throws AutomatException {
+    protected Symbol getPushBackSymbol() throws AutomatException {
         sb.deleteCharAt(sb.length() - 1);
+        return getSymbol();
+    }
+
+    protected Symbol getSymbol() throws AutomatException {
         Node n = ka.getNodeAfter(sb.toString());
         Symbol s = null;
         if (n instanceof SymbolNode) {
-            s = ((SymbolNode) n).getSymbol();
+            try {
+                s = (((SymbolNode) n).getSymbol()).clone();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             s.setAtt(sb.toString());
         }
-        clearString();
+        //clearString();
+        sb.delete(0, sb.length());
         return s;
     }
 
@@ -60,52 +120,17 @@ public class LexicalAutomata {
 
     public static void main(String[] args) {
         try {
-            char[] charset = new String("abcd10").toCharArray();
-            KAutomat ka = new KAutomat(charset);
-            Node a = new Node("0");
-            Node b = new SymbolNode("1", new Symbol("ident"));
-            a.addTransition(new Transition('a', b));
-            a.addTransition(new Transition('b', a));
-            b.addTransition(new Transition('a', a));
-            b.addTransition(new Transition('b', b));
-            ka.addNode(a);
-            ka.addNode(b);
-            ka.setStarting(a);
 
-            KAutomat ka2 = new KAutomat(charset);
-            a = new Node("2");
-            b = new SymbolNode("3", new Symbol("num"));
-            a.addTransition(new Transition('1', b));
-            b.addTransition(new Transition('0', b));
-            ka2.addNode(a);
-            ka2.addNode(b);
-            ka2.setStarting(a);
+            InputStream in = new FileInputStream("c:\\test.txt");
+            InputStream data = new FileInputStream("c:\\data.txt");
+            LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
+            la.setSource(data);
 
-            KAutomat[] data = new KAutomat[2];
-            data[0] = ka;
-            data[1] = ka2;
-
-            LexicalAutomata la = new LexicalAutomata(new String("abcd10").toCharArray(), data);
-            //System.out.println(la);
-
-            String s = "a1000001aaa11abbbbbaa110a";
-            boolean found = false;
-            int cycle = 0;
-
-            for (int i = 0; i < s.length(); i++) {
-                cycle++;
-                if (la.addChar(s.charAt(i))) {
-                    found = true;
-                    cycle = 0;
-                } else if (found == true) {
-                    found = false;
-                    i--;
-                    Symbol sym = la.getSymbolPushBack();
-                    if (sym != null) System.out.println(sym.getName() + " - " + sym.getAtt());
-                } else
-                    System.out.println("Error - " + cycle);
+            while (la.hasTokens()) {
+                System.out.println(la.getToken());
             }
-        } catch (AutomatException e) {
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -150,6 +175,6 @@ public class LexicalAutomata {
                 }
             }
         }
-
     }
+
 }

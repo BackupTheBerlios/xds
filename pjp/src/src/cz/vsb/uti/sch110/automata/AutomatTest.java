@@ -7,7 +7,7 @@ import java.util.Vector;
 import java.io.*;
 
 /**
-Testovací tøída automatu, obsahuje jednoduchý parser
+ * Testovací tøída automatu, obsahuje jednoduchý parser
  */
 public class AutomatTest {
     public static void main(String[] args) {
@@ -18,7 +18,7 @@ public class AutomatTest {
                 System.err.println("Using stdin as source of data");
                 in = new BufferedReader(new InputStreamReader(System.in));
             } else {
-                System.err.println("Using file "+args[0]+" as source of data");
+                System.err.println("Using file " + args[0] + " as source of data");
                 in = new BufferedReader(new FileReader(args[0]));
             }
 
@@ -84,7 +84,7 @@ public class AutomatTest {
             znk = new ZNKAutomat(sb.toString().toCharArray());
 
             if (states.size() == 0) {
-                System.err.println("Please specify at least one state");
+                //    System.err.println("Please specify at least one state");
                 System.exit(1);
             }
             for (int i = 0; i < states.size(); i++) {

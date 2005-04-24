@@ -26,4 +26,14 @@ public class Symbol {
     public void setAtt(String att) {
         this.att = att;
     }
+
+    public String toString() {
+        return name + " - " + att;
+    }
+
+    protected Symbol clone() throws CloneNotSupportedException {
+        Symbol n = new Symbol(name);
+        n.setAtt(att);
+        return n;
+    }
 }
