@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Trida umoznuje dynamicky vytvorit automat pro lexikalni analyzu ze zadaneho vstupniho proudu.
+ *
  * @author Vladimir Schafer - 23.4.2005 - 12:49:45
  */
 public class PJPLexicalAutomata extends LexicalAutomata {
@@ -19,9 +21,32 @@ public class PJPLexicalAutomata extends LexicalAutomata {
     private StringBuffer buffer = new StringBuffer();
 
     protected boolean addChar(char a) throws AutomatException {
-        buffer.append(a);
+        /**
+         * Osetreni bilych znaku v retezcich - neni mozne je ignorovat jako bile znaky mimo retezce
+         */
+        if (Character.isWhitespace(a)) {
+            // Pokud je to bily znak na konci slova
+            if (buffer.length() > 0) {
+                if (buffer.charAt(0) == '"') {
+                    buffer.append(a);
+                    a = '\'';
+                } else {
+                    // Vlozit chybovy znak, ktery bude stejne ihned smazan volanim getPushBackSymbol
+                    buffer.append('\0');
+                    return super.addChar('e');
+                }
+            }
+            // Bily znak na zacatku slova jednoduse ignorovat
+            else
+                return false;
+        } else {
+            buffer.append(a);
+        }
+
+        // Osetreni hromadnych znaku
         if (Character.isLetter(a)) a = 'a';
         if (Character.isDigit(a)) a = '0';
+
         return super.addChar(a);
     }
 
@@ -58,12 +83,10 @@ public class PJPLexicalAutomata extends LexicalAutomata {
             start: for (int pocet = 0; pocet < num; pocet++) {
 
                 name = folName;
-
                 Vector states = new Vector();
                 Vector transition = new Vector();
                 Vector active = states;
                 Map m = new HashMap();
-
                 token: while ((temp = in.readLine()) != null) {
                     StringTokenizer st = new StringTokenizer(temp);
                     while (st.hasMoreTokens()) {

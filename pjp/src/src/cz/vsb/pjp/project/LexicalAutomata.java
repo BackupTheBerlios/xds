@@ -60,14 +60,6 @@ public class LexicalAutomata {
 
             for (int i = 0; i < tmp.length(); i++) {
                 act = tmp.charAt(i);
-                if (Character.isWhitespace(act)) {
-                    if (found == true) {
-                        found = false;
-                        Symbol sym = getSymbol();
-                        if (sym != null) fronta.add(sym);
-                    }
-                    continue;
-                }
 
                 if (addChar(act)) {
                     found = true;
@@ -81,6 +73,12 @@ public class LexicalAutomata {
                 fronta.add(getSymbol());
             }
             tmp.delete(0, sb.length());
+        }
+    }
+
+    protected void checkContext(char a) {
+        if (Character.isWhitespace(a)) {
+            if (sb.charAt(0) == '"') ;
         }
     }
 
