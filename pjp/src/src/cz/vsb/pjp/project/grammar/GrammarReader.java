@@ -1,10 +1,5 @@
 package cz.vsb.pjp.project.grammar;
 
-import cz.vsb.pjp.project.grammar.Grammar;
-import cz.vsb.pjp.project.grammar.GrammarException;
-import cz.vsb.pjp.project.grammar.GrammarImpl;
-
-import java.util.*;
 import java.io.*;
 
 /**
@@ -13,7 +8,7 @@ import java.io.*;
  * jsou pojmenovany identifikatory zacinajicimi velkym pismenem,
  * terminalni symboly idetifikatory zacinajicimi malym pismenem.
  * Startovacim nonterminalem je symbol na leve strane prvniho pravidla
- * gramatiky. Pravidla maji tvar
+ * gramatiky. Pravidla NEmaji tvar
  * <pre>
  *    lhs : rhs1 | rhs2 | ... | rhsN ;
  *  </pre>
@@ -21,7 +16,6 @@ import java.io.*;
  * posloupnosti terminalnich a neterminalnich symbolu. Ve zdrojovem
  * textu mohou byt poznamky ohranicene slozenymi zavorkami.
  *
- * @author Miroslav.Benes@vsb.cz
  */
 public final class GrammarReader {
     /**
@@ -38,10 +32,10 @@ public final class GrammarReader {
      * Nacte gramatiku z textove reprezentace.
      *
      * @return Gramatika.
-     * @throws GrammarException Chyba pri prekladu zdrojove reprezentace gramatiky.
+     * @throws GrammarParseException Chyba pri prekladu zdrojove reprezentace gramatiky.
      * @throws IOException      Chyba pri praci se soubory.
      */
-    public Grammar read() throws GrammarException, IOException {
+    public Grammar read() throws GrammarParseException, IOException {
         GrammarImpl grammar = new GrammarImpl();
 
         ch = inp.read();
@@ -85,8 +79,8 @@ public final class GrammarReader {
      *
      * @param msg Text chyboveho hlaseni.
      */
-    private void error(String msg) throws GrammarException {
-        throw new GrammarException(msg, inp.getLineNumber());
+    private void error(String msg) throws GrammarParseException {
+        throw new GrammarParseException(msg, inp.getLineNumber());
     }
 
     // Kody specialnich lexikalnich symbolu
@@ -118,22 +112,34 @@ public final class GrammarReader {
                 break;
         }
 
-        // Identifikatory - jmena symbolu gramatiky
-        if (Character.isLetter((char) ch)) {
-            StringBuffer buf = new StringBuffer();
-            do {
-                buf.append((char) ch);
-                ch = inp.read();
-            } while (ch > 0 && Character.isLetterOrDigit((char) ch));
-            attr = buf.toString();
-            return Character.isLowerCase(attr.charAt(0)) ? SYM_T : SYM_NT;
+        int symbol = SYM_NT;
+
+        if (ch == '\'') {
+            symbol = SYM_T;
+            ch = inp.read();
+        } else        if (ch == ';' || ch == ':' || ch == '|') {
+            int sym = ch;
+            ch = inp.read();
+            return sym;
         }
 
+        // Identifikatory - jmena symbolu gramatiky
+        StringBuffer buf = new StringBuffer();
+        do {
+            buf.append((char) ch);
+            ch = inp.read();
 
-        // Ostatni jednoznakove symboly
-        int sym = ch;
-        ch = inp.read();
-        return sym;
+            if ((Character.isWhitespace((char) ch) && symbol == SYM_NT))
+                break;
+
+            if (ch == '\'' && symbol == SYM_T) {
+                ch = inp.read();
+                break;
+            }
+        } while (ch > 0);
+
+        attr = buf.toString();
+        return symbol;
     }
 
     /**

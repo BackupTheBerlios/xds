@@ -38,6 +38,10 @@ public abstract class Symbol implements Comparable {
         return name;
     }
 
+    public boolean equals(Object obj) {
+        return name.equals(((Symbol) obj).name);
+    }
+
     /**
      * Jmeno symbolu.
      */

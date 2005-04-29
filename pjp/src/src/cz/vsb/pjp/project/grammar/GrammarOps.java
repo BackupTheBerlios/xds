@@ -1,9 +1,5 @@
 package cz.vsb.pjp.project.grammar;
 
-import cz.vsb.pjp.project.grammar.DecompositionTable;
-import cz.vsb.pjp.project.grammar.Grammar;
-import cz.vsb.pjp.project.grammar.GrammarImpl;
-
 import java.util.*;
 
 /**
@@ -71,7 +67,7 @@ public class GrammarOps {
         while (nonterminals.hasNext()) {
             Nonterminal nt = (Nonterminal) nonterminals.next();
 
-            System.out.println("first(" + nt + ")=" + first(nt));
+            //System.out.println("first(" + nt + ")=" + first(nt));
 
             first.put(nt, first(nt));
 
@@ -87,7 +83,7 @@ public class GrammarOps {
 
             // konecny vypocet
             follow.put(nt, follow(nt));
-            System.out.println("follow(" + nt + ")=" + follow(nt));
+            //System.out.println("follow(" + nt + ")=" + follow(nt));
         }
 
     }
@@ -216,7 +212,7 @@ public class GrammarOps {
         return set;
     }
 
-    public DecompositionTable getDecompositionTable() {
+    public DecompositionTable getDecompositionTable() throws InvalidGrammarTypeException {
         DecompositionTable table = new DecompositionTable();
 
         Iterator rules = g.getRules();
@@ -237,7 +233,9 @@ public class GrammarOps {
                 Pair<Terminal, Nonterminal> key = new Pair<Terminal, Nonterminal>(trm, rule.getLHS());
 
                 if (table.containsKey(key))
-                    System.out.println("Ambiguous transition definition: " + key + " --- skipped.");
+                    // if the map contains key at the moment, the problem was in bad (if any!) detection
+                    // of passing LL1 grammar. Should we check it before? Is it worth doing?
+                    throw new InvalidGrammarTypeException(key.toString());
                 else
                     table.put(key, rule);
             }

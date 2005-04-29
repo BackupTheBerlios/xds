@@ -1,8 +1,5 @@
 package cz.vsb.pjp.project.grammar;
 
-import cz.vsb.pjp.project.grammar.EmptyTerminal;
-import cz.vsb.pjp.project.grammar.Grammar;
-
 import java.util.*;
 import java.io.*;
 

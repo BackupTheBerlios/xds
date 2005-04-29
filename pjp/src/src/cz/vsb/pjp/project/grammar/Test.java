@@ -1,6 +1,6 @@
 package cz.vsb.pjp.project.grammar;
 
-import cz.vsb.pjp.project.grammar.*;
+import cz.vsb.pjp.project.*;
 
 import java.io.*;
 
@@ -13,37 +13,46 @@ public class Test {
         // vytvorime prazdnou gramatiku
         Grammar grammar;
 
+        if (args.length != 2) {
+            System.err.println("Specify 2 parameters please.");
+            return;
+        }
+
         // nacteme jeji obsah ze souboru
         try {
             GrammarReader inp = new GrammarReader(new FileReader(args[0]));
             grammar = inp.read();
-        } catch (GrammarException e) {
+            GrammarOps go = new GrammarOps(grammar);
+
+            // load and prepare grammar
+
+            DecompositionTable d = go.getDecompositionTable();
+            StackAutomata sa = new StackAutomata(d);
+
+            // set up lexical analyser
+
+            InputStream in = new FileInputStream("rules.lex");
+            InputStream data = new FileInputStream(args[1]);
+            LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
+            la.setSource(data);
+
+            sa.processWord(la, grammar);
+            System.out.println("Expression is ACCEPTED");
+
+        } catch (GrammarParseException e) {
             // chyba pri analyze textu
             System.err.println("Error(" + e.getLineNumber() + ") " + e.getMessage());
+            return;
+        } catch (InvalidGrammarTypeException e) {
+            System.err.println("Can't build decomposition table: not an LL1 grammar?");
+            System.err.println("--- ambigugous table key was " + e.getMessage());
             return;
         } catch (IOException e) {
             // chyba vstupu/vystupu
             System.err.println("Error: " + e.getMessage());
             return;
+        } catch (SyntaxErrorException e) {
+            System.err.println("SYNTAX ERROR at line " + e.getLineNumber() + ": " + e.getMessage());
         }
-
-        // muzeme opsat, co jsme precetli
-
-//grammar.dump(System.out);
-
-        GrammarOps go = new GrammarOps(grammar);
-
-        DecompositionTable d = go.getDecompositionTable();
-        StackAutomata sa = new StackAutomata(d);
-
-        // vypiseme mnozinu nonterminalu generujicich prazdne slovo
-        /*Set empty = go.getEmptyNonterminals();
-        Iterator i_e = empty.iterator();
-        while( i_e.hasNext() ) {
-            Nonterminal nt = (Nonterminal)i_e.next();
-            System.out.print(nt.getName()+" ");
-        }
-        System.out.println(); */
-
     }
 }

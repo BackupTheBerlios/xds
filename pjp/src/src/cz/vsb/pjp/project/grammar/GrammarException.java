@@ -1,31 +1,15 @@
 package cz.vsb.pjp.project.grammar;
 
 /**
- * Vyjimka zpusobena chybou pri cteni gramatiky
- *
- * @author Miroslav.Benes@vsb.cz
+ * Date: 28.4.2005
+ * Time: 22:43:24
  */
 public class GrammarException extends Exception {
-    /**
-     * Vytvori instanci vyjimky ohlasujici chybu pri prekladu
-     * gramatiky.
-     *
-     * @param msg    Text chyboveho hlaseni.
-     * @param lineNo Cislo zdrojoveho radku s chybou.
-     */
-    public GrammarException(String msg, int lineNo) {
-        super(msg);
-        this.lineNumber = lineNo;
+    GrammarException(String message) {
+        super(message);
     }
 
-    /**
-     * Vrati cislo radku, na kterem byla chyba nalezena
-     *
-     * @return Cislo radku s chybou
-     */
-    public int getLineNumber() {
-        return lineNumber;
+    GrammarException() {
+        super();
     }
-
-    private int lineNumber;
 }
