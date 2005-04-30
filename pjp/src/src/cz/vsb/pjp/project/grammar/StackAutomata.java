@@ -17,14 +17,11 @@ public class StackAutomata {
     }
 
     public Stack<Rule> processWord(LexicalAutomata lex, Grammar g) throws SyntaxErrorException{
-        // TODO: lexikalni automat by moh vracet cislo radku, at tam nemam ty blbe -1
-        Stack<Rule> outputStack = new Stack<Rule>();
+       Stack<Rule> outputStack = new Stack<Rule>();
 
         Stack<Symbol> right = new Stack<Symbol>();
         right.add(g.getStartNonterminal());
 
-        //TODO: Je to dobre? Prislo mi to lepci, nez prvni naprcat vsechny lexemy do stacku a pak to z neho popovat.
-        //      klido to tak ale muzem udelat, pokud ti to prijde lepci :)
         boolean wantNextLexem = true;
         Terminal term = null;
         cz.vsb.pjp.project.Symbol sym = null;
