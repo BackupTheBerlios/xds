@@ -14,7 +14,6 @@ public class Node implements Comparable {
     protected boolean normalized = false;
 
     /**
-     *
      * @param name název stavu
      */
     public Node(String name) {
@@ -24,6 +23,7 @@ public class Node implements Comparable {
 
     /**
      * Pøidá pøechod z tohoto stavu
+     *
      * @param tran cílový stav a pøechodový znak
      * @throws AutomatException Výjímka v souèasné dobì není vyhazována
      */
@@ -33,6 +33,7 @@ public class Node implements Comparable {
 
     /**
      * Odstraní pøechod
+     *
      * @param tran
      */
     public void removeTransition(Transition tran) {
@@ -41,6 +42,7 @@ public class Node implements Comparable {
 
     /**
      * Vraci kolekci vsech nodu dostupnych zadanym znakem a vsech nodu dostupnych z nasledujicich pomoci E prechodu
+     *
      * @param znak
      * @return
      */
@@ -52,12 +54,12 @@ public class Node implements Comparable {
             try {
                 if (!(t instanceof ETransition)) {
                     if (t.getLetter() == znak) {
-                    Node n = t.getTarget();
-                    v.add(n);
-                    n.addETransition(v);
-                    // Pridat stavy dosazitelne pomoci E z Nodu n
-                    //v.addAll(c);
-                    // Pridat samotny nod n
+                        Node n = t.getTarget();
+                        v.add(n);
+                        n.addETransition(v);
+                        // Pridat stavy dosazitelne pomoci E z Nodu n
+                        //v.addAll(c);
+                        // Pridat samotny nod n
                     }
                 }
             } catch (AutomatException e) {
@@ -69,6 +71,7 @@ public class Node implements Comparable {
 
     /**
      * Do vlozene mnoziny vklada Nody dostupne pomoci E prechodu z tohoto objektu
+     *
      * @param actual
      * @return
      * @throws AutomatException
@@ -78,7 +81,7 @@ public class Node implements Comparable {
         Iterator i = c.iterator();
         Node tmp;
         while (i.hasNext()) {
-            tmp = (Node)i.next();
+            tmp = (Node) i.next();
             if (!actual.contains(tmp)) {
                 actual.add(tmp);
                 tmp.addETransition(actual);
@@ -90,19 +93,21 @@ public class Node implements Comparable {
 
     /**
      * Vraci kolekci Nodu dostunych jednim prechodem E z tohoto Nodu
+     *
      * @return
      */
     private Set getETransitionTarget() {
         HashSet v = new HashSet();
         Transition t;
         for (int i = 0; i < transitions.size(); i++) {
-            if (transitions.get(i) instanceof ETransition) v.add(((ETransition)transitions.get(i)).getTarget());
+            if (transitions.get(i) instanceof ETransition) v.add(((ETransition) transitions.get(i)).getTarget());
         }
         return v;
     }
 
     /**
      * Vrací název stavu
+     *
      * @return
      */
     public String getName() {
@@ -131,7 +136,7 @@ public class Node implements Comparable {
         if (!(o instanceof Node)) {
             throw new ClassCastException();
         } else {
-            return name.compareTo(((Node)o).name);
+            return name.compareTo(((Node) o).name);
         }
     }
 

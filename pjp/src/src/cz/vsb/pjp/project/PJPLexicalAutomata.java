@@ -20,34 +20,22 @@ public class PJPLexicalAutomata extends LexicalAutomata {
 
     private StringBuffer buffer = new StringBuffer();
 
-    protected boolean addChar(char a) throws AutomatException {
+    protected void addChar(char a) throws AutomatException {
         /**
          * Osetreni bilych znaku v retezcich - neni mozne je ignorovat jako bile znaky mimo retezce
          */
-        if (Character.isWhitespace(a)) {
-            // Pokud je to bily znak na konci slova
-            if (buffer.length() > 0) {
-                if (buffer.charAt(0) == '"') {
-                    buffer.append(a);
-                    a = '\'';
-                } else {
-                    // Vlozit chybovy znak, ktery bude stejne ihned smazan volanim getPushBackSymbol
-                    buffer.append('\0');
-                    return super.addChar('e');
-                }
-            }
-            // Bily znak na zacatku slova jednoduse ignorovat
-            else
-                return false;
-        } else {
-            buffer.append(a);
-        }
-
+        buffer.append(a);
         // Osetreni hromadnych znaku
+        if (Character.isWhitespace(a)) a = '\'';
         if (Character.isLetter(a)) a = 'a';
         if (Character.isDigit(a)) a = '0';
+        super.addChar(a);
+    }
 
-        return super.addChar(a);
+    protected void deleteChar() throws AutomatException {
+        super.deleteChar();
+        buffer.deleteCharAt(buffer.length() - 1);
+
     }
 
     protected Symbol getPushBackSymbol() throws AutomatException {

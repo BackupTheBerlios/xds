@@ -118,7 +118,7 @@ public class KAutomat extends AbstractAutomat {
                     }
                 }
             }
-            if (temp.isEmpty()) throw new AutomatException("No transition defined");
+            if (temp.isEmpty()) throw new AutomatException("No transition defined for char '" + word.charAt(i) + "' (position " + i + ") in word " + word);
             v = temp;
         }
         while (!v.isEmpty()) {

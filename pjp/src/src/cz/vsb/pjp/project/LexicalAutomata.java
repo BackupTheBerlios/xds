@@ -20,20 +20,19 @@ public class LexicalAutomata {
         Node start = new Node("start");
         zn.addNode(start);
         zn.setStarting(start);
+        start.addTransition(new Transition('\'', start));
         for (int i = 0; i < data.length; i++) {
             start.addTransition(new ETransition(data[i].getStartingNode()));
         }
         ka = zn.convertToKA();
     }
 
-    protected void clearString() {
-
-    }
-
     public void setSource(InputStream r) {
         br = new BufferedReader(new InputStreamReader(r));
     }
 
+    // TODO Mit moznost cist cisla radku
+    // TODO Vracet Terminal misto Symbolu
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         fillQueue();
         if (fronta.size() == 0) throw new NoMoreTokensException();
@@ -61,12 +60,18 @@ public class LexicalAutomata {
             for (int i = 0; i < tmp.length(); i++) {
                 act = tmp.charAt(i);
 
-                if (addChar(act)) {
+                addChar(act);
+                Node n = ka.getNodeAfter(sb.toString());
+                if (n instanceof SymbolNode)
                     found = true;
-                } else if (found == true) {
-                    found = false;
-                    i--;
-                    fronta.add(getPushBackSymbol());
+                else if (n instanceof ErrorNode) {
+                    if (found == true) {
+                        do {
+                            deleteChar();
+                            i--;
+                        } while (!(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
+                        fronta.add(getSymbol());
+                    }
                 }
             }
             if (found == true) {
@@ -76,19 +81,12 @@ public class LexicalAutomata {
         }
     }
 
-    protected void checkContext(char a) {
-        if (Character.isWhitespace(a)) {
-            if (sb.charAt(0) == '"') ;
-        }
+    protected void addChar(char a) throws AutomatException {
+        sb.append(a);
     }
 
-    protected boolean addChar(char a) throws AutomatException {
-        sb.append(a);
-        Node n = ka.getNodeAfter(sb.toString());
-        if (n instanceof SymbolNode)
-            return true;
-        else
-            return false;
+    protected void deleteChar() throws AutomatException {
+        sb.deleteCharAt(sb.length() - 1);
     }
 
     protected Symbol getPushBackSymbol() throws AutomatException {
@@ -158,6 +156,8 @@ public class LexicalAutomata {
 
                     if (symbol != null) {
                         node = new SymbolNode(Integer.toString(nextNum++), symbol);
+                    } else if (tmp.size() == 0) {
+                        node = new ErrorNode();
                     } else {
                         node = new Node(Integer.toString(nextNum++));
                     }
