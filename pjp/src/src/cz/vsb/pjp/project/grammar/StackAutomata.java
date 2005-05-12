@@ -26,6 +26,8 @@ public class StackAutomata {
         Terminal term = null;
         cz.vsb.pjp.project.Symbol sym = null;
 
+        DerivationTree tree = new DerivationTree();
+
         while (true) {
             if (right.isEmpty())
                 break;
@@ -72,8 +74,6 @@ public class StackAutomata {
 
             // now that we have a valid Terminal..
 
-           // System.out.print("Terminal " + term + " -> ");
-
             if (b instanceof Nonterminal) {
                 Rule r = table.get(new Pair<Terminal, Nonterminal>(term, (Nonterminal)b));
 
@@ -81,19 +81,27 @@ public class StackAutomata {
                 if (r == null)
                     throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) + ". Expected one of: " + table.getLeavesForNonterminal((Nonterminal)b), -1);
 
-                //System.out.println("Using rule " + r);
+                //System.out.println("Using rule " + sym.getAtt() + ", " + r);
 
                 right.pop();
 
                 outputStack.push(r);
+
+                for (Symbol sp: r.getRHS())
+                    tree.addNode(sp, sp instanceof Terminal);
+
+                tree.setValue(sym.getAtt());
+
+                tree.advance();
 
                 if (r.getRHS().isEmpty())
                     continue;
 
                 // we have to push it backwards on the top. That's why this hell...
                 Object symbols[] = r.getRHS().toArray();
-                for (int x=symbols.length-1; x>=0; x--)
+                for (int x=symbols.length-1; x>=0; x--) {
                     right.push((Symbol)symbols[x]);
+                }
 
             } else if (b instanceof Terminal) {
                 // on our 'right' stack is Terminal
@@ -102,7 +110,7 @@ public class StackAutomata {
                 if (term.equals(b)) {
                     right.pop();
                     wantNextLexem = true;
-                    //System.out.println("Removed terminal " + term + ". Requesting lex to pass new lexem.");
+                    //System.out.println("Removed terminal " + term + ": " + sym.getAtt() +". Requesting lex to pass new lexem.");
                 } else
                     throw new SyntaxErrorException("Expected: " + b, -1);
             } else
@@ -111,6 +119,4 @@ public class StackAutomata {
 
         return outputStack;
     }
-
-
 }

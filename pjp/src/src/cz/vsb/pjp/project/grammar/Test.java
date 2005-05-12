@@ -45,7 +45,7 @@ public class Test {
             return;
         } catch (InvalidGrammarTypeException e) {
             System.err.println("Can't build decomposition table: not an LL1 grammar?");
-            System.err.println("--- ambigugous table key was " + e.getMessage());
+            System.err.println("--- ambiguous table key was " + e.getMessage());
             return;
         } catch (IOException e) {
             // chyba vstupu/vystupu

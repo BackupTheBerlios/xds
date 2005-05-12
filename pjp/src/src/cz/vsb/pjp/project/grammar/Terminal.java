@@ -1,7 +1,5 @@
 package cz.vsb.pjp.project.grammar;
 
-import cz.vsb.pjp.project.grammar.Symbol;
-
 /**
  * Reprezentace terminalniho symbolu.
  *

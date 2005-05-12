@@ -129,7 +129,7 @@ public final class GrammarReader {
             buf.append((char) ch);
             ch = inp.read();
 
-            if ((Character.isWhitespace((char) ch) && symbol == SYM_NT))
+            if ((Character.isWhitespace((char) ch) && symbol == SYM_NT) || ch==';')
                 break;
 
             if (ch == '\'' && symbol == SYM_T) {
