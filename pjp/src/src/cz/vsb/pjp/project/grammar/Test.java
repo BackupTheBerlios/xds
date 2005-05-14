@@ -1,6 +1,7 @@
 package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.*;
+import cz.vsb.uti.sch110.automata.AutomatException;
 
 import java.io.*;
 
@@ -36,7 +37,7 @@ public class Test {
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
             la.setSource(data);
 
-            sa.processWord(la, grammar);
+            sa.processWord(la, grammar, go);
             System.out.println("Expression is ACCEPTED");
 
         } catch (GrammarParseException e) {
@@ -53,6 +54,8 @@ public class Test {
             return;
         } catch (SyntaxErrorException e) {
             System.err.println("SYNTAX ERROR at line " + e.getLineNumber() + ": " + e.getMessage());
+        } catch (AutomatException e) {
+            System.err.println("Lexical automaton has reported an exception: " + e.getMessage());
         }
     }
 }

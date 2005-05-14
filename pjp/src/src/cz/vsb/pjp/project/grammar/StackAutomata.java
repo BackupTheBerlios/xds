@@ -1,9 +1,11 @@
 package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.LexicalAutomata;
+import cz.vsb.uti.sch110.automata.AutomatException;
 
 import java.util.Stack;
 import java.util.Iterator;
+import java.io.IOException;
 
 /**
  * Date: 25.4.2005
@@ -16,8 +18,9 @@ public class StackAutomata {
         this.table = table;
     }
 
-    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g) throws SyntaxErrorException{
-       Stack<Rule> outputStack = new Stack<Rule>();
+    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g, GrammarOps ops)
+            throws SyntaxErrorException, IOException, AutomatException {
+        Stack<Rule> outputStack = new Stack<Rule>();
 
         Stack<Symbol> right = new Stack<Symbol>();
         right.add(g.getStartNonterminal());
@@ -29,8 +32,14 @@ public class StackAutomata {
         DerivationTree tree = new DerivationTree();
 
         while (true) {
-            if (right.isEmpty())
+            if (right.isEmpty() && !wantNextLexem && !lex.hasTokens())
                 break;
+
+            if (right.isEmpty()) {
+                // TODO: This happens when first lexem of statement could not be accepted
+                throw new SyntaxErrorException("First expression token should be one of " +
+                        ops.first(g.getStartNonterminal()), -1);
+            }
 
             Symbol b = right.peek();
 
@@ -78,10 +87,17 @@ public class StackAutomata {
                 Rule r = table.get(new Pair<Terminal, Nonterminal>(term, (Nonterminal)b));
 
                 // is the decomposition table filled-in at given coordinates?
-                if (r == null)
-                    throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) + ". Expected one of: " + table.getLeavesForNonterminal((Nonterminal)b), -1);
+                if (r == null) {
+                    if (ops.first(b).contains(GrammarImpl.EMPTY_TERMINAL)) {
+                        right.pop();
+                        continue;
+                    }
 
-                //System.out.println("Using rule " + sym.getAtt() + ", " + r);
+                    throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) + ". Expected one of: " +
+                            ops.first(b), -1);//table.getLeavesForNonterminal((Nonterminal)b), -1);
+                }
+
+                System.out.println("Using rule " + sym.getAtt() + ", " + r);
 
                 right.pop();
 

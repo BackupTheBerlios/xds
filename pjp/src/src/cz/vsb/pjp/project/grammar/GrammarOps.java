@@ -67,7 +67,7 @@ public class GrammarOps {
         while (nonterminals.hasNext()) {
             Nonterminal nt = (Nonterminal) nonterminals.next();
 
-            //System.out.println("first(" + nt + ")=" + first(nt));
+            System.out.println("first(" + nt + ")=" + first(nt));
 
             first.put(nt, first(nt));
 
@@ -226,7 +226,7 @@ public class GrammarOps {
             if (select.size() == 1 && select.first().compareTo(GrammarImpl.EMPTY_TERMINAL) == 0)
                 select = follow(rule.getLHS());
 
-            //System.out.println(select);
+            //System.out.println(rule + ": " + select);
 
             // narvat to do tabulky
             for (Terminal trm : select) {
