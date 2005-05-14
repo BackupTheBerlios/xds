@@ -54,7 +54,7 @@ public final class GrammarReader {
                 sym = getSym();
                 Rule rule = new Rule(lhs);
 
-                while (sym == SYM_NT || sym == SYM_T) {
+                while (sym == SYM_NT || sym == SYM_T || sym == SYM_ORDER) {
                     if (sym == SYM_NT) {
                         Nonterminal nt = grammar.addNonterminal(attr);
                         rule.addSymbol(nt);
@@ -62,6 +62,9 @@ public final class GrammarReader {
                     } else if (sym == SYM_T) {
                         Terminal t = grammar.addTerminal(attr);
                         rule.addSymbol(t);
+                        sym = getSym();
+                    } else if (sym == SYM_ORDER) {
+                        rule.parseSymbolOrder(attr);
                         sym = getSym();
                     }
                 }
@@ -86,6 +89,7 @@ public final class GrammarReader {
     // Kody specialnich lexikalnich symbolu
     private static final int SYM_NT = 'N';
     private static final int SYM_T = 'T';
+    private static final int SYM_ORDER = 'O';
     private static final int SYM_EOF = -1;
 
     /**
@@ -114,13 +118,21 @@ public final class GrammarReader {
 
         int symbol = SYM_NT;
 
+        // terminal - zacina apostrofem
         if (ch == '\'') {
             symbol = SYM_T;
             ch = inp.read();
-        } else        if (ch == ';' || ch == ':' || ch == '|') {
+        }
+        // specialni symbol
+        else if (ch == ';' || ch == ':' || ch == '|') {
             int sym = ch;
             ch = inp.read();
             return sym;
+        }
+        // poradi pravidel do prekladove gramatiky
+        else if (ch == '[') {
+           symbol = SYM_ORDER;
+           ch = inp.read();
         }
 
         // Identifikatory - jmena symbolu gramatiky
@@ -132,7 +144,8 @@ public final class GrammarReader {
             if ((Character.isWhitespace((char) ch) && symbol == SYM_NT) || ch==';')
                 break;
 
-            if (ch == '\'' && symbol == SYM_T) {
+            if ((ch == '\'' && symbol == SYM_T) || (ch == ']' && symbol == SYM_ORDER)) {
+                // preskocit apostrof
                 ch = inp.read();
                 break;
             }

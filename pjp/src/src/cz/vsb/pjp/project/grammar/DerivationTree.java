@@ -11,6 +11,7 @@ public class DerivationTree<T> {
         Vector<Node> children = new Vector<Node>(2);
         Node parent = null;
         T data;
+        Rule r;
         Object value;
         boolean opened = true;
 
@@ -43,10 +44,47 @@ public class DerivationTree<T> {
             opened = false;
         }
 
+        public String toString() {
+            if (children.isEmpty()) {
+                return data.toString() + " (" + value + ") ";
+            }
+
+            String s = "";
+            int[] o = r.getOrder();
+
+            if (o == null) {
+                for (Node n: children) {
+                    s += n + " ";
+                }
+            } else {
+                for (int x=0; x<o.length; x++)
+                    s += children.elementAt(o[x]);
+            }
+
+            return s;
+        }
+
+        protected void addToStack(Stack<ExecuteStackItem> s) {
+            if (children.isEmpty()) {
+                if (data instanceof Terminal)
+                    s.push(new ExecuteStackItem(data, value));
+                return;
+            }
+
+            int[] o = r.getOrder();
+
+            if (o == null) {
+                for (Node n: children) {
+                    n.addToStack(s);
+                }
+            } else {
+                for (int x=0; x<o.length; x++)
+                    children.elementAt(o[x]).addToStack(s);
+            }
+        }
     }
 
     protected Node root, current;
-    Stack<T> st=new Stack<T>();
 
     public DerivationTree() {
         root = new Node(null);
@@ -54,8 +92,6 @@ public class DerivationTree<T> {
     }
 
     public void addNode(T data, boolean close) {
-        if (close)
-        st.push(data);
         if (current == null)
             return;
         current.addChild(new Node(data), close);
@@ -69,11 +105,28 @@ public class DerivationTree<T> {
             current = current.parent;
         }
 
-        current = f;
+        if (current == null)
+            current = root;
+        else
+            current = f;
     }
 
     public void setValue(Object value) {
         if (!current.children.isEmpty())
             current.children.elementAt(0).value = value;
+    }
+
+    public void setRule(Rule r) {
+        current.r = r;
+    }
+
+    public String toString() {
+        return root.toString();
+    }
+
+    public Stack<ExecuteStackItem> getExecuteStack() {
+        Stack<ExecuteStackItem> s = new Stack<ExecuteStackItem>();
+        root.addToStack(s);
+        return s;
     }
 }

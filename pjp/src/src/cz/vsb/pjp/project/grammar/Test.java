@@ -29,6 +29,7 @@ public class Test {
 
             DecompositionTable d = go.getDecompositionTable();
             StackAutomata sa = new StackAutomata(d);
+            StackCodeProcessor proc = new StackCodeProcessor();
 
             // set up lexical analyser
 
@@ -37,7 +38,7 @@ public class Test {
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
             la.setSource(data);
 
-            sa.processWord(la, grammar, go);
+            sa.processWord(la, grammar, go, proc);
             System.out.println("Expression is ACCEPTED");
 
         } catch (GrammarParseException e) {

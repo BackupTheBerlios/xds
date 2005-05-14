@@ -18,28 +18,31 @@ public class StackAutomata {
         this.table = table;
     }
 
-    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g, GrammarOps ops)
+    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g, GrammarOps ops, StackCodeProcessor proc)
             throws SyntaxErrorException, IOException, AutomatException {
         Stack<Rule> outputStack = new Stack<Rule>();
 
         Stack<Symbol> right = new Stack<Symbol>();
-        right.add(g.getStartNonterminal());
 
         boolean wantNextLexem = true;
         Terminal term = null;
         cz.vsb.pjp.project.Symbol sym = null;
 
-        DerivationTree tree = new DerivationTree();
+        DerivationTree tree = null;
 
         while (true) {
-            if (right.isEmpty() && !wantNextLexem && !lex.hasTokens())
-                break;
-
-            if (right.isEmpty()) {
-                // TODO: This happens when first lexem of statement could not be accepted
-                throw new SyntaxErrorException("First expression token should be one of " +
-                        ops.first(g.getStartNonterminal()), -1);
+            // some code in stack to process?
+            if (right.isEmpty() && tree != null && !tree.root.children.isEmpty()) {
+                proc.processCode(tree.getExecuteStack());
             }
+
+            if (right.isEmpty() && lex.hasTokens()) {
+                right.add(g.getStartNonterminal());
+                tree = new DerivationTree();
+            }
+
+            if (!lex.hasTokens())
+                break;
 
             Symbol b = right.peek();
 
@@ -88,25 +91,27 @@ public class StackAutomata {
 
                 // is the decomposition table filled-in at given coordinates?
                 if (r == null) {
-                    if (ops.first(b).contains(GrammarImpl.EMPTY_TERMINAL)) {
-                        right.pop();
-                        continue;
-                    }
-
-                    throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) + ". Expected one of: " +
-                            ops.first(b), -1);//table.getLeavesForNonterminal((Nonterminal)b), -1);
+                    throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) +
+                            ". Expected one of: " + ops.first(b), -1);
                 }
 
-                System.out.println("Using rule " + sym.getAtt() + ", " + r);
+                //System.out.println("Using rule " + sym.getAtt() + ", " + r);
 
                 right.pop();
 
                 outputStack.push(r);
 
-                for (Symbol sp: r.getRHS())
-                    tree.addNode(sp, sp instanceof Terminal);
+                // build node of derivation tree. Note we must obey given order, because the tree
+                // has to be constructed using 'translation' grammar
+                for (Symbol sp: r.getRHS()) {
+                    Object trans = proc.translate(sp);
+
+                    if (trans != null)
+                        tree.addNode(sp, sp instanceof Terminal);
+                }
 
                 tree.setValue(sym.getAtt());
+                tree.setRule(r);
 
                 tree.advance();
 
@@ -128,7 +133,7 @@ public class StackAutomata {
                     wantNextLexem = true;
                     //System.out.println("Removed terminal " + term + ": " + sym.getAtt() +". Requesting lex to pass new lexem.");
                 } else
-                    throw new SyntaxErrorException("Expected: " + b, -1);
+                    throw new SyntaxErrorException("Expected only " + b, -1);
             } else
                 throw new SyntaxErrorException("Something is totally wrong", -1);
         }

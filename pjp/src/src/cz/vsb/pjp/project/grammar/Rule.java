@@ -55,6 +55,32 @@ public class Rule {
     private List<Symbol> rhs = new ArrayList<Symbol>();
 
     public String toString() {
-        return getLHS() + "->" + getRHS();
+        String s = getLHS() + "->" + getRHS();
+        if (order != null) {
+            s += "     (";
+            for (int x=0; x<order.length; x++)
+                s += (x>0 ? ", " : "") + order[x];
+            s += ")";
+        }
+
+        return s;
     }
+
+    private int[] order;
+
+    public boolean parseSymbolOrder(String str) {
+        order = new int[rhs.size()];
+
+        Scanner lineScanner = new Scanner(str);
+        lineScanner.useDelimiter(" ");
+
+        int i=0;
+        while (lineScanner.hasNextInt()) {
+            order[i++] =lineScanner.nextInt();
+        }
+
+        return i == order.length;
+    }
+
+    public int[] getOrder() { return order; }
 }
