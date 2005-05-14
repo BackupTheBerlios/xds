@@ -51,7 +51,7 @@ public class ZNKAutomat extends AbstractAutomat {
      * @return
      * @throws AutomatException
      */
-    private Vector findStartingNodes() throws AutomatException {
+    protected Vector findStartingNodes() throws AutomatException {
         Iterator it = start.iterator();
         // Startovaci Nody
         Vector v = new Vector(6);

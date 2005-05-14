@@ -3,10 +3,7 @@ package cz.vsb.pjp.project;
 import cz.vsb.uti.sch110.automata.*;
 
 import java.io.*;
-import java.util.Vector;
-import java.util.StringTokenizer;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Trida umoznuje dynamicky vytvorit automat pro lexikalni analyzu ze zadaneho vstupniho proudu.
@@ -14,11 +11,36 @@ import java.util.Map;
  * @author Vladimir Schafer - 23.4.2005 - 12:49:45
  */
 public class PJPLexicalAutomata extends LexicalAutomata {
+    private StringBuffer buffer = new StringBuffer();
+    private HashMap<String, Symbol> keywords = new HashMap<String, Symbol>();
+
     private PJPLexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         super(charset, data);
+        keywords.put("var", new Symbol("var", "var"));
+        keywords.put("and", new Symbol("logic", "and"));
+        keywords.put("or", new Symbol("logic", "or"));
+        keywords.put("not", new Symbol("not", "not"));
+        keywords.put("true", new Symbol("true", "true"));
+        keywords.put("false", new Symbol("false", "false"));
+        keywords.put("integer", new Symbol("integer", "integer"));
+        keywords.put("string", new Symbol("string", "string"));
+        keywords.put("real", new Symbol("real", "real"));
+        keywords.put("boolean", new Symbol("boolean", "boolean"));
+        keywords.put("mod", new Symbol("arithmetical", "mod"));
     }
 
-    private StringBuffer buffer = new StringBuffer();
+    // TODO Mit moznost cist cisla radku
+    // TODO Vracet Terminal misto Symbolu
+    public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
+        Symbol s = super.getToken();
+        while (s.getName().equals("komentar")) s = super.getToken();
+        if (s.getName().equals("ident")) {
+            if (keywords.containsKey(s.getAtt())) {
+                return keywords.get(s.getAtt());
+            }
+        }
+        return s;
+    }
 
     protected void addChar(char a) throws AutomatException {
         /**
@@ -27,7 +49,7 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         buffer.append(a);
         // Osetreni hromadnych znaku
         if (Character.isWhitespace(a)) a = '\'';
-        if (Character.isLetter(a)) a = 'a';
+        //if (Character.isLetter(a)) a = 'a';
         if (Character.isDigit(a)) a = '0';
         super.addChar(a);
     }

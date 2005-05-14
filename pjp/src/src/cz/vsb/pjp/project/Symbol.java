@@ -15,6 +15,11 @@ public class Symbol {
         name = type;
     }
 
+    public Symbol(String name, String att) {
+        this.name = name;
+        this.att = att;
+    }
+
     public String getName() {
         return name;
     }

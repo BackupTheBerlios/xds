@@ -17,7 +17,7 @@ public class LexicalAutomata {
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
-        Node start = new Node("start");
+        ErrorNode start = new ErrorNode();
         zn.addNode(start);
         zn.setStarting(start);
         start.addTransition(new Transition('\'', start));
@@ -52,9 +52,10 @@ public class LexicalAutomata {
             char act;
 
             String next = br.readLine();
-            if (next != null)
+            if (next != null) {
+                next = next.toLowerCase();
                 tmp.append(next);
-            else
+            } else
                 return;
 
             for (int i = 0; i < tmp.length(); i++) {
@@ -64,7 +65,9 @@ public class LexicalAutomata {
                 Node n = ka.getNodeAfter(sb.toString());
                 if (n instanceof SymbolNode)
                     found = true;
-                else if (n instanceof ErrorNode) {
+                else if (n instanceof StartNode) {
+                    deleteChar();
+                } else if (n instanceof ErrorNode) {
                     if (found == true) {
                         do {
                             deleteChar();
@@ -134,6 +137,32 @@ public class LexicalAutomata {
     private class ZNKAutomatSymbol extends ZNKAutomat {
         ZNKAutomatSymbol(char[] charset) {
             super(charset);
+        }
+
+        public KAutomat convertToKA() throws AutomatException {
+            KAutomat kat = new KAutomat(charset);
+            // Mapuje na nove Nody ze starych
+            HashMap hm = new HashMap();
+
+            Vector v = findStartingNodes();
+            Set akt = new HashSet(start);
+            akt.addAll(v);
+
+            // Stav, ze ktereho hledam okoli
+            StartNode n = new StartNode();
+            hm.put(akt, n);
+            kat.addNode(n);
+            kat.setStarting(n);
+
+            if (isAccepting(akt)) {
+                kat.setAccepting(n);
+            }
+
+            followNodes(hm, kat, akt, n);
+            kat.normalize();
+            nextNum = 1;
+
+            return kat;
         }
 
         protected void followNodes(Map newPoints, KAutomat kat, Set aktualSet, Node aktualNode) throws AutomatException {
