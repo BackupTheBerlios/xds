@@ -22,11 +22,11 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         keywords.put("not", new Symbol("not", "not"));
         keywords.put("true", new Symbol("true", "true"));
         keywords.put("false", new Symbol("false", "false"));
-        keywords.put("integer", new Symbol("integer", "integer"));
-        keywords.put("string", new Symbol("string", "string"));
-        keywords.put("real", new Symbol("real", "real"));
-        keywords.put("boolean", new Symbol("boolean", "boolean"));
-        keywords.put("mod", new Symbol("arithmetical", "mod"));
+        keywords.put("integer", new Symbol("type", "integer"));
+        keywords.put("string", new Symbol("type", "string"));
+        keywords.put("real", new Symbol("type", "real"));
+        keywords.put("boolean", new Symbol("type", "boolean"));
+        keywords.put("mod", new Symbol("arithmeticalb", "mod"));
     }
 
     // TODO Mit moznost cist cisla radku
