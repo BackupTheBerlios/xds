@@ -30,13 +30,15 @@ public class PJPLexicalAutomata extends LexicalAutomata {
     }
 
     // TODO Mit moznost cist cisla radku
-    // TODO Vracet Terminal misto Symbolu
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         Symbol s = super.getToken();
         while (s.getName().equals("komentar")) s = super.getToken();
+        if (s.getName().equals("stringval")) {
+            s.setAtt(s.getAtt().substring(1, s.getAtt().length()-1));
+        }
         if (s.getName().equals("ident")) {
-            if (keywords.containsKey(s.getAtt())) {
-                return keywords.get(s.getAtt());
+            if (keywords.containsKey(s.getAtt().toLowerCase())) {
+                return keywords.get(s.getAtt().toLowerCase());
             }
         }
         return s;
@@ -49,9 +51,8 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         buffer.append(a);
         // Osetreni hromadnych znaku
         if (Character.isWhitespace(a)) a = '\'';
-        //if (Character.isLetter(a)) a = 'a';
         if (Character.isDigit(a)) a = '0';
-        super.addChar(a);
+        super.addChar(Character.toLowerCase(a));
     }
 
     protected void deleteChar() throws AutomatException {
