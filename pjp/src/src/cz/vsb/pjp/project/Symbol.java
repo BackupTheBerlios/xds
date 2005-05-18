@@ -7,6 +7,25 @@ public class Symbol {
     protected String name;
     protected String att;
 
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public void setLine(int line) {
+        this.line = line;
+    }
+
+    protected int line;
+    protected int pos;
+
     public Symbol() {
         name = "default";
     }

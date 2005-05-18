@@ -16,6 +16,9 @@ public class LexicalAutomata {
     private LinkedList<Symbol> fronta = new LinkedList<Symbol>();
     private int line = 0;
     private int word = 0;
+    private int linew = 0;
+    private int wordw = 0;
+
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
@@ -33,12 +36,31 @@ public class LexicalAutomata {
         br = new BufferedReader(new InputStreamReader(r));
     }
 
+    /**
+     * Vraci radek, na kterem se vyskytuje aktualni symbol ve zdrojovem souboru
+     * @return
+     */
+    public int getLine() {
+        return linew;
+    }
+
+    /**
+     * Vraci pozici na radku, na ktere se vyskytuje aktualni symbol ve zdrojovem souboru
+     * @return
+     */
+    public int getPosition() {
+        return wordw;
+    }
+
     // TODO Mit moznost cist cisla radku
     // TODO Vracet Terminal misto Symbolu
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         fillQueue();
         if (fronta.size() == 0) throw new NoMoreTokensException();
-        return fronta.poll();
+        Symbol s = fronta.poll();
+        linew = s.line;
+        wordw = s.pos;
+        return s;
     }
 
     public boolean hasTokens() throws IOException, AutomatException {
@@ -107,6 +129,8 @@ public class LexicalAutomata {
                             word--;
                         } while (sb.length() > 1 && !(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
                         Symbol s = getSymbol();
+                        s.setLine(line);
+                        s.setPos(word);
                         if (s != null)
                             fronta.add(s);
 
@@ -118,7 +142,10 @@ public class LexicalAutomata {
                 }
             }
             if (found == true) {
-                fronta.add(getSymbol());
+                Symbol s = getSymbol();
+                s.setLine(line);
+                s.setPos(word);
+                fronta.add(s);
             }
             tmp.delete(0, sb.length());
         }
