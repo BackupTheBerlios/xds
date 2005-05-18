@@ -45,6 +45,8 @@ public class RealValue extends Value {
             this.value = ((RealValue) v).value;
         } else if (v instanceof IntegerValue) {
             this.value = ((IntegerValue) v).value;
+        } else if (v instanceof FakeValue) {
+            return;
         } else
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
@@ -76,6 +78,8 @@ public class RealValue extends Value {
                 return new BooleanValue(value != val.getRealValue());
             } else if (operator.equals("=")) {
                 return new BooleanValue(value == val.getRealValue());
+            } else if (operator.equals("fake")) {
+                return this;
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with real type");
         } else

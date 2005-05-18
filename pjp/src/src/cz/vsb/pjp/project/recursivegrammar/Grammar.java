@@ -13,7 +13,6 @@ import java.util.*;
  * @author Vladimir Schafer - 15.5.2005 - 10:40:34
  */
 public class Grammar {
-    //TODO Zotaveni
     LexicalAutomata l;
     Symbol s;
     HashMap<String, Value> symbolTable = new HashMap<String, Value>();
@@ -59,37 +58,47 @@ public class Grammar {
         }
     }
 
-    public void Statement() throws AutomatException, IOException, GrammarException {
+    public void synchro(HashSet<String> context) throws IOException, GrammarException, AutomatException {
+        System.out.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition());
+        try {
+            while (!context.contains(s.getName())) {
+                s = l.getToken();
+            }
+        } catch (NoMoreTokensException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void Statement(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        if (s.getName().equals(LexicalAutomata.EOF)) return;
+
+        if (!(s.getName().equals("ident") || s.getName().equals("var") || s.getName().equals("semicolon"))) synchro(context);
 
         if (s.getName().equals("ident")) {
             String name = s.getAtt();
             expect("ident");
-            B(name);
+            HashSet<String> next = (HashSet<String>) context.clone();
+            next.add("semicolon");
+            B(name, next);
         } else if (s.getName().equals("var")) {
             expect("var");
-            Declaration();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            next.add("semicolon");
+            Declaration(next);
         } else if (s.getName().equals("semicolon")) {
             expect(";");
-        } else {
-            System.out.println("Syntax Error Statement");
         }
 
         // Osetreni konce vyhodnocovani
-        if (l.hasTokens()) {
-            expect(";");
-            Statement();
-        } else {
-            if (s.getName().equals("semicolon"))
-                return;
-            else
-                System.out.println("Error");
-        }
+        expect(";");
+        Statement(context);
     }
 
-    public String Declaration() throws AutomatException, GrammarException, IOException {
+    public String Declaration(HashSet<String> context) throws AutomatException, GrammarException, IOException {
         Symbol tmp = s;
         expect("ident");
-        String type = D();
+        HashSet<String> next = (HashSet<String>) context.clone();
+        String type = D(next);
 
         if (symbolTable.containsKey(tmp.getAtt().toLowerCase())) {
             throw new GrammarException("Variable is already defined");
@@ -100,10 +109,13 @@ public class Grammar {
         return type;
     }
 
-    public String D() throws AutomatException, GrammarException, IOException {
+    public String D(HashSet<String> context) throws AutomatException, GrammarException, IOException {
+        if (!(s.getName().equals("comma") || s.getName().equals("colon"))) synchro(context);
+
         if (s.getAtt().equals(",")) {
             expect(",");
-            return Declaration();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            return Declaration(next);
         } else if (s.getName().equals("colon")) {
             expect(":");
             String type;
@@ -119,44 +131,52 @@ public class Grammar {
         }
     }
 
-    public void B(String name) throws AutomatException, IOException, GrammarException {
+    public void B(String name, HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        if (!(s.getName().equals("leftp") || s.getName().equals("colon"))) synchro(context);
         Symbol tmp = s;
         if (tmp.getAtt().equals(":")) {
             expect(":");
-            Assign(name);
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Assign(name, next);
         } else if (tmp.getAtt().equals("(")) {
             expect("(");
             Value v = symbolTable.get(name);
             if (v != null && v.getType().equals("function")) {
                 Function f = (Function) v;
-                Func(f);
-            } // TODO else error
-            expect(")"); //)
+                HashSet<String> next = (HashSet<String>) context.clone();
+                next.add("rightp");
+                Func(f, next);
+            }
+            expect(")");
             return;
         }
     }
 
-    public void Func(Function f) throws AutomatException, IOException, GrammarException {
+    public void Func(Function f, HashSet<String> context) throws AutomatException, IOException, GrammarException {
         LinkedList<Value> ll = new LinkedList<Value>();
-        ll.add(Expr());
-        Func2(ll);
+        HashSet<String> next = (HashSet<String>) context.clone();
+        next.add("comma");
+        ll.add(Expr(next));
+        Func2(ll, context);
         f.ExecuteFunction(ll);
     }
 
-    public AbstractList<Value> Func2(AbstractList<Value> ll) throws AutomatException, IOException, GrammarException {
+    public AbstractList<Value> Func2(AbstractList<Value> ll, HashSet<String> context) throws AutomatException, IOException, GrammarException {
         if (s.getAtt().equals(",")) {
-            expect(","); //,
-            ll.add(Expr());
-            Func2(ll);
+            expect(",");
+            HashSet<String> next = (HashSet<String>) context.clone();
+            ll.add(Expr(next));
+            Func2(ll, context);
         }
 
         return ll;
     }
 
-    public void Assign(String prom) throws AutomatException, IOException, GrammarException {
-        expect("=");  //=
-        //Assign
-        Value value = Expr();
+    public void Assign(String prom, HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        expect("=");
+        HashSet<String> next = (HashSet<String>) context.clone();
+        next.add("comma");
+        Value value = Expr(next);
         Value old;
 
         prom = prom.toLowerCase();
@@ -168,82 +188,107 @@ public class Grammar {
             throw new GrammarException("Variable " + prom + " is not defined");
     }
 
-    public Value Expr() throws AutomatException, IOException, GrammarException {
-        Value data = E();
+    public Value Expr(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        HashSet<String> next = (HashSet<String>) context.clone();
+        next.add("arithmeticalb");
+        next.add("concat");
+        next.add("or");
+        next.add("relation");
+        Value data = E(next);
         if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getName().equals("or") || s.getName().equals("relation")) {
-            data = E1(data);
+            next = (HashSet<String>) context.clone();
+            data = E1(data, next);
         }
         return data;
     }
 
-    public Value E1(Value in) throws AutomatException, GrammarException, IOException {
+    public Value E1(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
         if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getName().equals("or")) {
-            in = G(in);
+            HashSet<String> next = (HashSet<String>) context.clone();
+            in = G(in, next);
         } else if (s.getName().equals("relation")) {
-            in = E2(in);
+            HashSet<String> next = (HashSet<String>) context.clone();
+            in = E2(in, next);
         }
 
         return in;
     }
 
-    public Value E2(Value in) throws AutomatException, GrammarException, IOException {
+    public Value E2(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
         Symbol tmp = s;
         if (s.getName().equals("relation")) {
             expect("relation");
-            Value value = E();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value value = E(next);
             //value = E1(value);
-            value = G(value);
+            next = (HashSet<String>) context.clone();
+            value = G(value, next);
             in = in.performOperation(tmp.getAtt(), value);
-            in = E2(in);
+            next = (HashSet<String>) context.clone();
+            in = E2(in, next);
         }
 
         return in;
     }
 
-    public Value G(Value in) throws AutomatException, GrammarException, IOException {
+    public Value G(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
         String oper = s.getAtt();
         if (s.getName().equals("arithmeticalb")) {
             expect("arithmeticalb");
-            Value value = E();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value value = E(next);
             in = in.performOperation(oper, value);
-            in = G(in);
+            next = (HashSet<String>) context.clone();
+            in = G(in, next);
         } else if (s.getName().equals("concat")) {
             expect(".");
-            Value value = E();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value value = E(next);
             in = in.performOperation(oper, value);
-            in = G(in);
+            next = (HashSet<String>) context.clone();
+            in = G(in, next);
         } else if (s.getName().equals("or")) {
             expect("or");
-            Value value = E();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value value = E(next);
             in = in.performOperation(oper, value);
-            in = G(in);
+            next = (HashSet<String>) context.clone();
+            in = G(in, next);
         }
 
         return in;
     }
 
-    public Value E() throws AutomatException, GrammarException, IOException {
-        Value value = H();
-        value = T1(value);
+    public Value E(HashSet<String> context) throws AutomatException, GrammarException, IOException {
+        HashSet<String> next = (HashSet<String>) context.clone();
+        next.add("arithmeticala");
+        Value value = H(next);
+        next = (HashSet<String>) context.clone();
+        value = T1(value, next);
         return value;
     }
 
-    public Value T1(Value in) throws AutomatException, GrammarException, IOException {
+    public Value T1(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
         Symbol tmp = s;
         if (tmp.getName().equals("arithmeticala")) {
             expect("arithmeticala");
-            Value valueB = H();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value valueB = H(next);
             in = in.performOperation(tmp.getAtt(), valueB);
-            in = T1(in);
+            next = (HashSet<String>) context.clone();
+            in = T1(in, next);
         }
         return in;
     }
 
-    public Value H1() throws AutomatException, IOException, GrammarException {
+    public Value H1(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        if (!(s.getName().equals("leftp") || s.getName().equals("ident") || s.getName().equals("true") || s.getName().equals("false") || s.getName().equals("numberint") || s.getName().equals("numberdouble"))) synchro(context);
         Symbol tmp = s;
         if (s.getName().equals("leftp")) {
             expect("(");
-            Value val = Expr();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            next.add("rightp");
+            Value val = Expr(next);
             expect(")");
             return val;
         } else if (s.getName().equals("ident")) {
@@ -267,23 +312,26 @@ public class Grammar {
             expect("numberdouble");
             return new RealValue(tmp.getAtt());
         } else {
-            throw new GrammarException("Error in H1");
+            return new FakeValue();
         }
     }
 
-    public Value H() throws AutomatException, IOException, GrammarException {
+    public Value H(HashSet<String> context) throws AutomatException, IOException, GrammarException {
         Symbol tmp = s;
         if (tmp.getAtt().equals("-")) {
             expect("-");
-            return H1().performUnaryOperation("-");
+            HashSet<String> next = (HashSet<String>) context.clone();
+            return H1(next).performUnaryOperation("-");
         } else if (tmp.getName().equals("not")) {
             expect("not");
-            return H1().performUnaryOperation("not");
+            HashSet<String> next = (HashSet<String>) context.clone();
+            return H1(next).performUnaryOperation("not");
         } else if (tmp.getName().equals("stringval")) {
             expect("stringval");
             return new StringValue(tmp.getAtt());
         } else {
-            return H1();
+            HashSet<String> next = (HashSet<String>) context.clone();
+            return H1(next);
         }
     }
 
@@ -296,7 +344,9 @@ public class Grammar {
             la.setSource(data);
 
             Grammar g = new Grammar(la);
-            g.Statement();
+            HashSet<String> follow = new HashSet<String>();
+            follow.add(LexicalAutomata.EOF);
+            g.Statement(follow);
 
         } catch (Exception e) {
             e.printStackTrace();

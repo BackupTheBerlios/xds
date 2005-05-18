@@ -18,7 +18,7 @@ public class LexicalAutomata {
     private int word = 0;
     private int linew = 0;
     private int wordw = 0;
-
+    public final static String EOF = "@EOF";
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
@@ -38,6 +38,7 @@ public class LexicalAutomata {
 
     /**
      * Vraci radek, na kterem se vyskytuje aktualni symbol ve zdrojovem souboru
+     *
      * @return
      */
     public int getLine() {
@@ -46,14 +47,13 @@ public class LexicalAutomata {
 
     /**
      * Vraci pozici na radku, na ktere se vyskytuje aktualni symbol ve zdrojovem souboru
+     *
      * @return
      */
     public int getPosition() {
         return wordw;
     }
 
-    // TODO Mit moznost cist cisla radku
-    // TODO Vracet Terminal misto Symbolu
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         fillQueue();
         if (fronta.size() == 0) throw new NoMoreTokensException();
@@ -80,10 +80,12 @@ public class LexicalAutomata {
                 tmp.append(next);
                 line++;
                 word = 0;
-            } else
+            } else {
+                fronta.add(new Symbol(EOF, EOF));
                 return;
+            }
 
-            while(sb.length() > 0) {
+            while (sb.length() > 0) {
                 deleteChar();
             }
 
@@ -130,7 +132,7 @@ public class LexicalAutomata {
                         } while (sb.length() > 1 && !(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
                         Symbol s = getSymbol();
                         s.setLine(line);
-                        s.setPos(word);
+                        s.setPos(word - s.getAtt().length());
                         if (s != null)
                             fronta.add(s);
 
@@ -144,7 +146,7 @@ public class LexicalAutomata {
             if (found == true) {
                 Symbol s = getSymbol();
                 s.setLine(line);
-                s.setPos(word);
+                s.setPos(word - s.getAtt().length());
                 fronta.add(s);
             }
             tmp.delete(0, sb.length());

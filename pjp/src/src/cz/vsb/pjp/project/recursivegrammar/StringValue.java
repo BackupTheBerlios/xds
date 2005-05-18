@@ -34,6 +34,8 @@ public class StringValue extends Value {
     public void setValue(Value v) throws UnsupportedOperationException {
         if (v instanceof StringValue) {
             this.value = ((StringValue) v).value;
+        } else if (v instanceof FakeValue) {
+            return;
         } else
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
@@ -59,6 +61,8 @@ public class StringValue extends Value {
                 return new BooleanValue((value.compareTo(val.getRealValue()) != 0) ? true : false);
             } else if (operator.equals("=")) {
                 return new BooleanValue((value.compareTo(val.getRealValue()) == 0) ? true : false);
+            } else if (operator.equals("fake")) {
+                return this;
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with integer type");
         } else

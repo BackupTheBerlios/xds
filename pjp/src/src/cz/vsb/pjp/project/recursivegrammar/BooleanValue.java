@@ -41,6 +41,8 @@ public class BooleanValue extends Value {
     public void setValue(Value v) throws UnsupportedOperationException {
         if (v instanceof BooleanValue) {
             this.value = ((BooleanValue) v).value;
+        } else if (v instanceof FakeValue) {
+            return;
         } else
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
@@ -77,6 +79,8 @@ public class BooleanValue extends Value {
                     return new BooleanValue(true);
                 else
                     return new BooleanValue(false);
+            } else if (operator.equals("fake")) {
+                return this;
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with boolean type");
         } else
