@@ -130,7 +130,6 @@ public class Grammar {
 
     public void Func(Function f) throws AutomatException, IOException, GrammarException, NoMoreTokensException {
         LinkedList<Value> ll = new LinkedList<Value>();
-        Symbol tmp = s;
         ll.add(Expr());
         Func2(ll);
         f.ExecuteFunction(ll);
@@ -140,6 +139,7 @@ public class Grammar {
         if (s.getAtt().equals(",")) {
             expect(); //,
             ll.add(Expr());
+            Func2(ll);
         }
 
         return ll;
@@ -150,7 +150,6 @@ public class Grammar {
         //Assign
         Value value = Expr();
         Value old;
-        Variable v;
 
         prom = prom.toLowerCase();
         old = symbolTable.get(prom);
