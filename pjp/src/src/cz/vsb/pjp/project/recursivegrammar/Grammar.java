@@ -6,11 +6,8 @@ import cz.vsb.pjp.project.Symbol;
 import cz.vsb.pjp.project.NoMoreTokensException;
 import cz.vsb.pjp.project.PJPLexicalAutomata;
 
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Vladimir Schafer - 15.5.2005 - 10:40:34
@@ -20,10 +17,34 @@ public class Grammar {
     //TODO Zotaveni
     LexicalAutomata l;
     Symbol s;
-    HashSet<Variable> symbolTable = new HashSet<Variable>();
+    HashMap<String, Value> symbolTable = new HashMap<String, Value>();
 
     public Grammar(LexicalAutomata l) {
         this.l = l;
+        symbolTable.put("write", new Function() {
+            public Object ExecuteFunction(AbstractList<Value> values) {
+                int size = values.size();
+                for (int i = 0; i < size; i++) {
+                    System.out.println(values.get(i).toString());
+                }
+                return null;
+            }
+        });
+
+        symbolTable.put("read", new Function() {
+            public Object ExecuteFunction(AbstractList<Value> values) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+                int size = values.size();
+                for (int i = 0; i < size; i++) {
+                    try {
+                        values.get(i).setValue(br.readLine());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        });
     }
 
     public void expect() throws AutomatException, IOException, NoMoreTokensException {
@@ -37,36 +58,36 @@ public class Grammar {
         else
             return;
 
-        if (s.getName().equals("ident")) {
-            String name = s.getAtt();
+        Symbol tmp = s;
+        expect(); //ident, semicol, ...
+        if (tmp.getName().equals("ident")) {
+            String name = tmp.getAtt();
             B(name);
-            if (!s.getName().equals("semicolon")) ; //error;
+            if (!tmp.getName().equals("semicolon")) ; //error;
             Statement();
-        } else if (s.getName().equals("var")) {
+        } else if (tmp.getName().equals("var")) {
             Declaration();
-            if (!s.getName().equals("semicolon")) ; //error;
+            if (!tmp.getName().equals("semicolon")) ; //error;
             Statement();
-        } else if (s.getName().equals("semicolon")) {
+        } else if (tmp.getName().equals("semicolon")) {
             Statement();
         }
     }
 
-    public void Declaration() throws AutomatException, GrammarException, IOException, NoMoreTokensException {
+    /*public void Declaration() throws AutomatException, GrammarException, IOException, NoMoreTokensException {
         expect(); //var
         C();
-    }
+    }*/
 
-    public String C() throws AutomatException, GrammarException, IOException, NoMoreTokensException {
+    public String Declaration() throws AutomatException, GrammarException, IOException, NoMoreTokensException {
         Symbol tmp = s;
         expect(); //ident
         String type = D();
 
-
-        Variable v = new Variable(tmp.getAtt(), Value.getDefaultValue(type));
-        if (symbolTable.contains(v)) {
+        if (symbolTable.containsKey(tmp.getAtt().toLowerCase())) {
             throw new GrammarException("Variable is already defined");
         } else {
-            symbolTable.add(v);
+            symbolTable.put(tmp.getAtt().toLowerCase(), Value.getDefaultValue(type));
         }
         System.out.println(tmp.getAtt() + " - " + type);
         return type;
@@ -75,7 +96,7 @@ public class Grammar {
     public String D() throws AutomatException, GrammarException, IOException, NoMoreTokensException {
         if (s.getAtt().equals(",")) {
             expect();
-            return C();
+            return Declaration();
         } else if (s.getName().equals("colon")) {
             expect();
             String type;
@@ -92,32 +113,52 @@ public class Grammar {
     }
 
     public void B(String name) throws AutomatException, IOException, GrammarException, NoMoreTokensException {
-        expect();
-        if (s.getAtt().equals(":")) {
+        Symbol tmp = s;
+        expect(); //:(
+        if (tmp.getAtt().equals(":")) {
             Assign(name);
-        } else if (s.getName().equals("(")) {
-            //Func;
+        } else if (tmp.getAtt().equals("(")) {
+            Value v = symbolTable.get(name);
+            if (v.getType().equals("function")) {
+                Function f = (Function) v;
+                Func(f);
+            } // TODO else error
+            expect(); //)
+            return;
         }
     }
 
+    public void Func(Function f) throws AutomatException, IOException, GrammarException, NoMoreTokensException {
+        LinkedList<Value> ll = new LinkedList<Value>();
+        Symbol tmp = s;
+        ll.add(Expr());
+        Func2(ll);
+        f.ExecuteFunction(ll);
+    }
+
+    public AbstractList<Value> Func2(AbstractList<Value> ll) throws AutomatException, IOException, GrammarException, NoMoreTokensException {
+        if (s.getAtt().equals(",")) {
+            expect(); //,
+            ll.add(Expr());
+        }
+
+        return ll;
+    }
+
     public void Assign(String prom) throws AutomatException, IOException, GrammarException, NoMoreTokensException {
-        expect(); //:
         expect();  //=
         //Assign
         Value value = Expr();
+        Value old;
         Variable v;
 
-        Iterator<Variable> i = symbolTable.iterator();
-        while (i.hasNext()) {
-            v = i.next();
-            if (v.name.equals(prom)) {
-                v.value.setValue(value);
-                System.out.println(prom + " - " + value);
-                return;
-            }
-        }
-
-        throw new GrammarException("Variable " + prom + " is not defined");
+        prom = prom.toLowerCase();
+        old = symbolTable.get(prom);
+        if (old != null) {
+            old.setValue(value);
+            System.out.println(prom + " - " + value);
+        } else
+            throw new GrammarException("Variable " + prom + " is not defined");
     }
 
     public Value Expr() throws AutomatException, IOException, GrammarException, NoMoreTokensException {
@@ -192,15 +233,12 @@ public class Grammar {
             if (s.getName().equals("rightp")) expect();
             return val;
         } else if (tmp.getName().equals("ident")) {
-            Iterator<Variable> i = symbolTable.iterator();
-            Variable v;
-            while (i.hasNext()) {
-                v = i.next();
-                if (v.name.equals(tmp.getAtt())) {
-                    return v.getValue();
-                }
-            }
-            throw new GrammarException("Variable " + tmp.getAtt() + " doesn't exist");
+            String val = tmp.getAtt().toLowerCase();
+            Value v = symbolTable.get(val);
+            if (v != null)
+                return v;
+            else
+                throw new GrammarException("Variable " + tmp.getAtt() + " doesn't exist");
         } else if (tmp.getName().equals("true")) {
             return new BooleanValue(true);
         } else if (tmp.getName().equals("false")) {

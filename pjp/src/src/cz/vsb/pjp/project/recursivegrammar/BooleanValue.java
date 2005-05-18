@@ -15,6 +15,10 @@ public class BooleanValue extends Value {
         this.value = Boolean.parseBoolean(value);
     }
 
+    public void setValue(String value) {
+        this.value = Boolean.parseBoolean(value);
+    }
+
     public String getType() {
         return type;
     }

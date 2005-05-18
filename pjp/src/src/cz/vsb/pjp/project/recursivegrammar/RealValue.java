@@ -15,6 +15,10 @@ public class RealValue extends Value {
         this.value = Double.parseDouble(value);
     }
 
+    public void setValue(String value) {
+        this.value = Double.parseDouble(value);
+    }
+
     public String getType() {
         return type;
     }

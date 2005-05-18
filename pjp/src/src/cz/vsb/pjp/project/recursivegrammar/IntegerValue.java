@@ -25,6 +25,10 @@ public class IntegerValue extends Value {
         return Integer.toString(value);
     }
 
+    public void setValue(String value) {
+        this.value = Integer.parseInt(value);
+    }
+
     public int getRealValue() {
         return value;
     }
