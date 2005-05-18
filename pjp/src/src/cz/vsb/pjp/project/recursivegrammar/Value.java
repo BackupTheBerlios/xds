@@ -17,6 +17,8 @@ public abstract class Value {
 
     public abstract Value performUnaryOperation(String operator) throws UnsupportedOperationException;
 
+    public abstract void setValue(Value v) throws UnsupportedOperationException;
+
     public static Value getDefaultValue(String type) throws UnsupportedOperationException {
         if (type.equals("integer"))
             return new IntegerValue(0);

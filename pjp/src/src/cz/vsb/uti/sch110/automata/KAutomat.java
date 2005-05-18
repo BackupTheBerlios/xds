@@ -1,8 +1,5 @@
 package cz.vsb.uti.sch110.automata;
 
-import cz.vsb.uti.sch110.automata.AbstractAutomat;
-import cz.vsb.uti.sch110.automata.AutomatException;
-
 import java.util.*;
 
 /**
@@ -118,7 +115,7 @@ public class KAutomat extends AbstractAutomat {
                     }
                 }
             }
-            if (temp.isEmpty()) throw new AutomatException("No transition defined for char '" + word.charAt(i) + "' (position " + i + ") in word " + word);
+            if (temp.isEmpty()) throw new NoTransitionException("No transition defined for char '" + word.charAt(i) + "' (position " + i + ") in word " + word);
             v = temp;
         }
         while (!v.isEmpty()) {

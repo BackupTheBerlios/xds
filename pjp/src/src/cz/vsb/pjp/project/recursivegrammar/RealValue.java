@@ -36,6 +36,15 @@ public class RealValue extends Value {
         return new RealValue(value);
     }
 
+    public void setValue(Value v) throws UnsupportedOperationException {
+        if (v instanceof RealValue) {
+            this.value = ((RealValue) v).value;
+        } else if (v instanceof IntegerValue) {
+            this.value = ((IntegerValue) v).value;
+        } else
+            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+    }
+
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof IntegerValue) {
             v = new RealValue(((IntegerValue) v).getRealValue());

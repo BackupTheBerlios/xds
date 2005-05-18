@@ -1,9 +1,6 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
 import cz.vsb.uti.sch110.automata.AutomatException;
-import cz.vsb.pjp.project.recursivegrammar.StringValue;
-import cz.vsb.pjp.project.recursivegrammar.RealValue;
-import cz.vsb.pjp.project.recursivegrammar.GrammarException;
 import cz.vsb.pjp.project.LexicalAutomata;
 import cz.vsb.pjp.project.Symbol;
 import cz.vsb.pjp.project.NoMoreTokensException;
@@ -19,9 +16,8 @@ import java.util.Iterator;
  * @author Vladimir Schafer - 15.5.2005 - 10:40:34
  */
 public class Grammar {
-    //TODO Support for not, -
-    //TODO Konverze int do real pri prirazovani
     //TODO Funkce
+    //TODO Zotaveni
     LexicalAutomata l;
     Symbol s;
     HashSet<Variable> symbolTable = new HashSet<Variable>();
@@ -109,19 +105,19 @@ public class Grammar {
         expect();  //=
         //Assign
         Value value = Expr();
-        Variable v = new Variable(prom, value);
-        if (symbolTable.contains(v)) {
-            Iterator<Variable> i = symbolTable.iterator();
-            while (i.hasNext()) {
-                v = i.next();
-                if (v.name.equals(prom)) {
-                    v.setValue(value);
-                }
+        Variable v;
+
+        Iterator<Variable> i = symbolTable.iterator();
+        while (i.hasNext()) {
+            v = i.next();
+            if (v.name.equals(prom)) {
+                v.value.setValue(value);
+                System.out.println(prom + " - " + value);
+                return;
             }
-        } else {
-            throw new GrammarException("Variable " + prom + " is not defined");
         }
-        System.out.println(prom + " - " + value);
+
+        throw new GrammarException("Variable " + prom + " is not defined");
     }
 
     public Value Expr() throws AutomatException, IOException, GrammarException, NoMoreTokensException {
@@ -188,7 +184,7 @@ public class Grammar {
         return in;
     }
 
-    public Value H() throws AutomatException, IOException, GrammarException, NoMoreTokensException {
+    public Value H1() throws AutomatException, IOException, GrammarException, NoMoreTokensException {
         Symbol tmp = s;
         expect(); //leftp, number, ...
         if (tmp.getName().equals("leftp")) {
@@ -213,10 +209,24 @@ public class Grammar {
             return new IntegerValue(tmp.getAtt());
         } else if (tmp.getName().equals("numberdouble")) {
             return new RealValue(tmp.getAtt());
-        } else if (tmp.getName().equals("string")) {
-            return new StringValue(tmp.getAtt());
         } else {
             throw new NoMoreTokensException();
+        }
+    }
+
+    public Value H() throws AutomatException, IOException, GrammarException, NoMoreTokensException {
+        Symbol tmp = s;
+        if (tmp.getAtt().equals("-")) {
+            expect(); //-
+            return H1().performUnaryOperation("-");
+        } else if (tmp.getName().equals("not")) {
+            expect(); //not
+            return H1().performUnaryOperation("not");
+        } else if (tmp.getName().equals("stringval")) {
+            expect(); //stringval
+            return new StringValue(tmp.getAtt());
+        } else {
+            return H1();
         }
     }
 

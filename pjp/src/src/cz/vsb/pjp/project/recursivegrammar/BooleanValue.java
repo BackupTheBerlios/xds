@@ -34,6 +34,13 @@ public class BooleanValue extends Value {
         throw new UnsupportedOperationException("Unary operator: " + operator + " isn't supported");
     }
 
+    public void setValue(Value v) throws UnsupportedOperationException {
+        if (v instanceof BooleanValue) {
+            this.value = ((BooleanValue) v).value;
+        } else
+            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+    }
+
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof BooleanValue) {
             BooleanValue val = (BooleanValue) v;
@@ -41,6 +48,11 @@ public class BooleanValue extends Value {
                 return new BooleanValue(val.getRealValue() && value);
             } else if (operator.equals("or")) {
                 return new BooleanValue(value || val.getRealValue());
+            } else if (operator.equals("=")) {
+                if (value == val.getRealValue())
+                    return new BooleanValue(true);
+                else
+                    return new BooleanValue(false);
             } else if (operator.equals(">")) {
                 if (value && !val.getRealValue())
                     return new BooleanValue(true);
@@ -62,7 +74,7 @@ public class BooleanValue extends Value {
                 else
                     return new BooleanValue(false);
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with integer type");
+                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with boolean type");
         } else
             throw new UnsupportedOperationException("Can't process Boolean and " + v.getType());
     }

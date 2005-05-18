@@ -27,6 +27,13 @@ public class StringValue extends Value {
         throw new UnsupportedOperationException("Unary operator: " + operator + " isn't supported");
     }
 
+    public void setValue(Value v) throws UnsupportedOperationException {
+        if (v instanceof StringValue) {
+            this.value = ((StringValue) v).value;
+        } else
+            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+    }
+
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof RealValue) {
             return v.performOperation(operator, this);
@@ -51,6 +58,6 @@ public class StringValue extends Value {
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with integer type");
         } else
-            throw new UnsupportedOperationException("Can't process Integer and " + v.getType());
+            throw new UnsupportedOperationException("Can't process String and " + v.getType());
     }
 }
