@@ -14,6 +14,8 @@ public class LexicalAutomata {
     private StringBuffer sb = new StringBuffer();
     private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     private LinkedList<Symbol> fronta = new LinkedList<Symbol>();
+    private int line = 0;
+    private int word = 0;
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
@@ -53,27 +55,65 @@ public class LexicalAutomata {
 
             String next = br.readLine();
             if (next != null) {
-                next = next.toLowerCase();
                 tmp.append(next);
+                line++;
+                word = 0;
             } else
                 return;
 
+            while(sb.length() > 0) {
+                deleteChar();
+            }
+
             for (int i = 0; i < tmp.length(); i++) {
+                word++;
                 act = tmp.charAt(i);
 
                 addChar(act);
-                Node n = ka.getNodeAfter(sb.toString());
+                Node n;
+                try {
+                    n = ka.getNodeAfter(sb.toString());
+                } catch (NoTransitionException e) {
+                    int len = sb.length() - 1;
+                    sb.deleteCharAt(len);
+                    sb.append('~');
+                    n = ka.getNodeAfter(sb.toString());
+                }
                 if (n instanceof SymbolNode)
                     found = true;
                 else if (n instanceof StartNode) {
                     deleteChar();
                 } else if (n instanceof ErrorNode) {
+
+                    // Vyzkouset, jestli nemuze nasledovat libovolny znak - pro komentare a stringy. Je to hnus, ale co se da delat :)
+                    int len = sb.length() - 1;
+                    char temp = sb.charAt(len);
+                    sb.deleteCharAt(len);
+                    sb.append('~');
+                    n = ka.getNodeAfter(sb.toString());
+
+                    if (!(n instanceof ErrorNode)) {
+                        found = false;
+                        continue;
+                    } else {
+                        sb.deleteCharAt(len);
+                        sb.append(temp);
+                    }
+
                     if (found == true) {
                         do {
                             deleteChar();
                             i--;
-                        } while (!(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
-                        fronta.add(getSymbol());
+                            word--;
+                        } while (sb.length() > 1 && !(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
+                        Symbol s = getSymbol();
+                        if (s != null)
+                            fronta.add(s);
+
+                        found = false;
+                    } else {
+                        System.out.println("Syntax error: char " + act + " at line " + line + ", char " + word);
+                        deleteChar();
                     }
                 }
             }
@@ -120,7 +160,7 @@ public class LexicalAutomata {
     public static void main(String[] args) {
         try {
 
-            InputStream in = new FileInputStream("src//rules.lex");
+            InputStream in = new FileInputStream("src//rules2.lex");
             InputStream data = new FileInputStream("src//vtest.txt");
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
             la.setSource(data);
