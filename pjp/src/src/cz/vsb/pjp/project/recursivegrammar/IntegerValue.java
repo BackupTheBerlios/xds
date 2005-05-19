@@ -95,11 +95,11 @@ public class IntegerValue extends Value {
                 return new BooleanValue(value != val.getRealValue());
             } else if (operator.equals("=")) {
                 return new BooleanValue(value == val.getRealValue());
-            } else if (operator.equals("fake")) {
-                return this;
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with integer type");
-        } else
-            throw new UnsupportedOperationException("Can't process Integer and " + v.getType());
+        } else if (v instanceof FakeValue)
+            return this;
+        else
+            throw new UnsupportedOperationException("Can't process integer and " + v.getType());
     }
 }

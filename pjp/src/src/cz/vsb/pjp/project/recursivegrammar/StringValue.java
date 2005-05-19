@@ -74,8 +74,10 @@ public class StringValue extends Value {
             } else if (operator.equals("fake")) {
                 return this;
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with integer type");
-        } else
-            throw new UnsupportedOperationException("Can't process String and " + v.getType());
+                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with string type");
+        } else if (v instanceof FakeValue)
+            return this;
+        else
+            throw new UnsupportedOperationException("Can't process string and " + v.getType());
     }
 }

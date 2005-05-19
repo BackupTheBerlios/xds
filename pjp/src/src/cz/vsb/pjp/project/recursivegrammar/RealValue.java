@@ -100,7 +100,9 @@ public class RealValue extends Value {
                 return this;
             } else
                 throw new UnsupportedOperationException("Operator " + operator + " isn't supported with real type");
-        } else
-            throw new UnsupportedOperationException("Can't process Real and " + v.getType());
+        } else if (v instanceof FakeValue)
+            return this;
+        else
+            throw new UnsupportedOperationException("Can't process real and " + v.getType());
     }
 }

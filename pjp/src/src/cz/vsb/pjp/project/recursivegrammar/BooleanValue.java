@@ -101,11 +101,11 @@ public class BooleanValue extends Value {
                     return new BooleanValue(true);
                 else
                     return new BooleanValue(false);
-            } else if (operator.equals("fake")) {
-                return this;
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with boolean type");
-        } else
-            throw new UnsupportedOperationException("Can't process Boolean and " + v.getType());
+                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with bool type");
+        } else if (v instanceof FakeValue)
+            return this;
+        else
+            throw new UnsupportedOperationException("Can't process bool and " + v.getType());
     }
 }
