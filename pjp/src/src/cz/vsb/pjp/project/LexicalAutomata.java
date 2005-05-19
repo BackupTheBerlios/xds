@@ -148,7 +148,7 @@ public class LexicalAutomata {
                         fronta.add(s);
                         found = false;
                     } else {
-                        System.out.println("Syntax error: char " + act + " at line " + line + ", char " + word);
+                        System.err.println("Syntax error: char " + act + " at line " + line + ", char " + word);
                         clearBuffer();
                     }
                 }
@@ -159,7 +159,7 @@ public class LexicalAutomata {
                 s.setPos(word - s.getAtt().length());
                 fronta.add(s);
             } else if (tmp.length() > 0) {
-                System.out.println("B Syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
+                System.err.println("Syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
                 clearBuffer();
             }
 
