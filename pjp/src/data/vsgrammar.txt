@@ -1,0 +1,54 @@
+{
+PJP project grammar alt.
+~~~~~~~~~~~~~~~~~~~
+
+  Authors: sch110, luk117
+  Revision: final
+
+Meaning of nonterminals:
+    STATEMENT   - Language statement. Must be terminated with ';'
+    EXPRESSION  - Any expression. Can be assign, declaration, function call etc.
+	FORMULA     - Arithmetic formula.
+	LOGICAL_OP  - Logical operation (with result TRUE or FALSE)
+    ...
+
+}
+
+STATEMENT  : 'var' DECLARATION ';' STATEMENT
+           | 'ident' B ';' STATEMENT
+           | ';' STATEMENT
+           | {e};
+
+DECLARATION : 'ident' D;
+D           : ',' DECLARATION
+            | ':' 'type';
+
+B          : ':' ASSIGN
+           | '(' FUNC ')';
+
+ASSIGN     : '=' EXPR;
+
+FUNC       : EXPR FUNC2;
+
+FUNC2      : ',' EXPR FUNC2;
+           | {e}
+
+EXPR       : E E1;
+E          : H T1;
+H          : '-' H1
+           | H1
+           | 'stringval';
+H1         : 'numberint'
+           | 'ident'
+           | 'numberdouble'
+           | '(' EXPR ')';
+T1         : 'arithmeticala' H T1
+           | 'and' H T1
+           | {e};
+E1         : G E2;
+G          : 'arithmeticalb' E G
+           | 'concat' E G
+           | 'or' E G
+           | {e};
+E2         : 'relation' E G E2
+           | {e};

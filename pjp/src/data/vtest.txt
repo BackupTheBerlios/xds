@@ -1,0 +1,2 @@
+var b : boolean;
+b := (2<5) or (not (4=3));

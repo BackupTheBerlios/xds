@@ -1,0 +1,81 @@
+{ 
+PJP project grammar
+~~~~~~~~~~~~~~~~~~~
+
+   Authors: sch110, luk117
+  Revision: alpha
+
+Meaning of nonterminals:
+    STATEMENT   - Language statement. Must be terminated with ';'
+    EXPRESSION  - Any expression. Can be assign, declaration, function call etc.
+	FORMULA     - Arithmetic formula.
+	LOGICAL_OP  - Logical operation (with result TRUE or FALSE)
+    ...
+
+}
+
+STATEMENT  : EXPRESSION ';' ;
+
+EXPRESSION : ID_FIRST
+           | DECLARATION
+           | {e} ;
+
+ID_FIRST   : 'ident' ID_FOLLOW ;
+
+ID_FOLLOW  : ':' '=' AFORMULA
+           | FUNCTION_CALL ;
+
+AFORMULA   :  DXPR AG'             [1 0];
+
+AG'        :  'relation' DXPR AG'
+           |  {e};
+
+DXPR       :  T1 E'             [1 0];
+
+E'         :  '+' T1 E'
+           |  '-' T1 E'
+           |  '.' T1 E'
+           |  'or' T1 E'
+           |  {e};
+
+T1         :  T2 T1'            [ 1 0 ];
+
+T1'        :  '*' T2 T1'
+           |  '/' T2 T1'
+           |  'mod' T2 T1'
+           |  'and' T2 T1'
+           |  {e} ;
+
+T2         :  OPERAND T'             [1 0] ;
+
+T'         :  'not' OPERAND T'
+           |  'unary' OPERAND T'
+           |  {e} ;
+
+OPERAND    :  '(' AFORMULA ')'
+           | 'numberint'
+           | 'numberdouble'
+           | 'string'
+           | 'ident'
+           | 'not' OPERAND
+           | BOOL_CONST ;
+
+BOOL_CONST : 'true'
+           | 'false' ;
+
+DECLARATION : 'var' DA ':' VARTYPE  [ 0 3 2 1 ];
+
+VARTYPE    : 'type' ;
+
+DA         : 'ident' DA' ;
+
+DA'        : ',' DA
+           | {e};
+
+FUNCTION_CALL : '(' ARGS ')' ;
+
+ARGS       : AFORMULA ARG'    ;   { ARG' ARGUMENT}
+
+ARG'       : {e}
+           | ',' ARGS  [ 0 1 ];
+
