@@ -4,6 +4,8 @@ import java.util.Vector;
 import java.util.AbstractList;
 
 /**
+ * Trida reprezentuje funkci v tabulce symbolu. Vola se metodou executefunction, ktere se predaji parametry
+ *
  * @author Vladimir Schafer - 18.5.2005 - 13:54:56
  */
 public abstract class Function extends Value {

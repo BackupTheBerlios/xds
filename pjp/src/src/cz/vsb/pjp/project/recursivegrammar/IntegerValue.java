@@ -1,8 +1,8 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
-import cz.vsb.pjp.project.recursivegrammar.RealValue;
-
 /**
+ * Hodnota prirozeneho cisla
+ *
  * @author Vladimir Schafer - 15.5.2005 - 14:10:04
  */
 public class IntegerValue extends Value {
@@ -33,6 +33,13 @@ public class IntegerValue extends Value {
         return value;
     }
 
+    /**
+     * Podporovane operace: -
+     *
+     * @param operator
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
         if (operator.equals("-")) {
             value = -value;
@@ -51,6 +58,14 @@ public class IntegerValue extends Value {
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
 
+    /**
+     * Podporovane operace: -, *, /, mod, <, >, <=, >=, <>, =
+     *
+     * @param operator
+     * @param v        jen Integer
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof RealValue) {
             return v.performOperation(operator, this);

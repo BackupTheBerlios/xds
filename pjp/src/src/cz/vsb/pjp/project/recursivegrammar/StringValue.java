@@ -1,6 +1,8 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
 /**
+ * Retezcova hodnota
+ *
  * @author Vladimir Schafer - 15.5.2005 - 14:10:04
  */
 public class StringValue extends Value {
@@ -40,6 +42,14 @@ public class StringValue extends Value {
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
 
+    /**
+     * Podporovane operace: <, >, <=, >=, <>, =. Vola na retezce compareTo.
+     *
+     * @param operator
+     * @param v        jen Integer
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof RealValue) {
             return v.performOperation(operator, this);

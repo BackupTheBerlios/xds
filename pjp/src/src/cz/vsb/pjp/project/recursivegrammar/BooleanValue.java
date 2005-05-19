@@ -1,6 +1,8 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
 /**
+ * Hodnota bool
+ *
  * @author Vladimir Schafer - 15.5.2005 - 14:46:33
  */
 public class BooleanValue extends Value {
@@ -31,6 +33,13 @@ public class BooleanValue extends Value {
         return value;
     }
 
+    /**
+     * Podporovane operace: not
+     *
+     * @param operator
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
         if (operator.equals("not")) {
             return new BooleanValue(!value);
@@ -47,6 +56,14 @@ public class BooleanValue extends Value {
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
 
+    /**
+     * Podporovane operace: and, or, =, <, >, <=, >=, =, <>
+     *
+     * @param operator
+     * @param v        jen Integer
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof BooleanValue) {
             BooleanValue val = (BooleanValue) v;
@@ -64,6 +81,11 @@ public class BooleanValue extends Value {
                     return new BooleanValue(true);
                 else
                     return new BooleanValue(false);
+            } else if (operator.equals("<>")) {
+                if (value == val.getRealValue())
+                    return new BooleanValue(false);
+                else
+                    return new BooleanValue(true);
             } else if (operator.equals("<")) {
                 if (!value && val.getRealValue())
                     return new BooleanValue(true);

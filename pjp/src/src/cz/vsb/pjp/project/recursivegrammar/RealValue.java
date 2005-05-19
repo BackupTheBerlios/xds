@@ -1,6 +1,8 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
 /**
+ * Hodnota realneho cisla
+ *
  * @author Vladimir Schafer - 15.5.2005 - 14:25:22
  */
 public class RealValue extends Value {
@@ -31,6 +33,13 @@ public class RealValue extends Value {
         return value;
     }
 
+    /**
+     * Podporovane operace: -
+     *
+     * @param operator
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
         if (operator.equals("-")) {
             value = -value;
@@ -51,6 +60,15 @@ public class RealValue extends Value {
             throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
     }
 
+
+    /**
+     * Podporovane operace: -, *, /, mod, <, >, <=, >=, <>, =
+     *
+     * @param operator
+     * @param v        jen Integer
+     * @return
+     * @throws UnsupportedOperationException
+     */
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof IntegerValue) {
             v = new RealValue(((IntegerValue) v).getRealValue());
