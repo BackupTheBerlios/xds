@@ -54,12 +54,12 @@ public class Grammar {
                 e.printStackTrace();
             }
         else {
-            System.out.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
+            System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
         }
     }
 
     public void synchro(HashSet<String> context) throws IOException, GrammarException, AutomatException {
-        System.out.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition());
+        System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition());
         try {
             while (!context.contains(s.getName())) {
                 s = l.getToken();
@@ -340,7 +340,7 @@ public class Grammar {
 
             InputStream in = new FileInputStream("src//rules2.lex");
             InputStream data = new FileInputStream("src//vtest.txt");
-            LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
+            LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
             la.setSource(data);
 
             Grammar g = new Grammar(la);
