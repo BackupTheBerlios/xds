@@ -1,6 +1,7 @@
 package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.*;
+import cz.vsb.pjp.project.grammar.client.StackCodeProcessor;
 import cz.vsb.uti.sch110.automata.AutomatException;
 
 import java.io.*;
@@ -39,8 +40,6 @@ public class Test {
             la.setSource(data);
 
             sa.processWord(la, grammar, go, proc);
-            System.out.println("Expression is ACCEPTED");
-
         } catch (GrammarParseException e) {
             // chyba pri analyze textu
             System.err.println("Error(" + e.getLineNumber() + ") " + e.getMessage());

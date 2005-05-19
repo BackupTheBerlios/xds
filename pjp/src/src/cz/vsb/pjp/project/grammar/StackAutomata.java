@@ -1,6 +1,7 @@
 package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.LexicalAutomata;
+import cz.vsb.pjp.project.grammar.client.StackCodeProcessor;
 import cz.vsb.uti.sch110.automata.AutomatException;
 
 import java.util.Stack;
@@ -8,8 +9,6 @@ import java.util.Iterator;
 import java.io.IOException;
 
 /**
- * Date: 25.4.2005
- * Time: 13:14:52
  */
 public class StackAutomata {
     protected DecompositionTable table;
@@ -28,7 +27,7 @@ public class StackAutomata {
         Terminal term = null;
         cz.vsb.pjp.project.Symbol sym = null;
 
-        DerivationTree tree = null;
+        DerivationTree<Symbol> tree = null;
 
         while (true) {
             // some code in stack to process?
@@ -38,7 +37,7 @@ public class StackAutomata {
 
             if (right.isEmpty() && lex.hasTokens()) {
                 right.add(g.getStartNonterminal());
-                tree = new DerivationTree();
+                tree = new DerivationTree<Symbol>();
             }
 
             if (!lex.hasTokens())
@@ -69,7 +68,7 @@ public class StackAutomata {
 
                         // TODO: this is *VERY* bad!
                         // tohle je samozrejme nesmysl, ktery slouzi pouze k otestovani automatu
-                        if (t.getName().equals(sym.getName()) || t.getName().equals(sym.getAtt())) {
+                        if (t.getName().equals(sym.getName()) /*|| t.getName().equals(sym.getAtt())*/) {
                             term = t;
                             break;
                         }
@@ -104,13 +103,11 @@ public class StackAutomata {
                 // build node of derivation tree. Note we must obey given order, because the tree
                 // has to be constructed using 'translation' grammar
                 for (Symbol sp: r.getRHS()) {
-                    Object trans = proc.translate(sp);
-
-                    if (trans != null)
+                    if (proc.isSymbolAccepted(sp))
                         tree.addNode(sp, sp instanceof Terminal);
                 }
 
-                tree.setValue(sym.getAtt());
+                tree.setValue(proc.translate(sym));
                 tree.setRule(r);
 
                 tree.advance();

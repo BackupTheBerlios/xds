@@ -82,6 +82,8 @@ public class GrammarOps {
             Nonterminal nt = (Nonterminal) nonterminals.next();
 
             // konecny vypocet
+            //if (nt.getName().equals("T"))
+            //    System.out.print("t");
             follow.put(nt, follow(nt));
 
             //System.out.println("follow(" + nt + ")=" + follow(nt));
@@ -227,7 +229,7 @@ public class GrammarOps {
             if (select.size() == 1 && select.first().compareTo(GrammarImpl.EMPTY_TERMINAL) == 0)
                 select = follow(rule.getLHS());
 
-            System.out.println(rule + ": " + select);
+            //System.out.println(rule + ": " + select);
 
             // narvat to do tabulky
             for (Terminal trm : select) {
