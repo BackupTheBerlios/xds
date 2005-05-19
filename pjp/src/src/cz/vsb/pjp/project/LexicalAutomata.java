@@ -113,7 +113,9 @@ public class LexicalAutomata {
                     found = true;
                 else if (n instanceof StartNode) {
                     deleteChar();
-                } else if (n instanceof ErrorNode) {
+                } else if (!(n instanceof ErrorNode)) {
+                    found = false;
+                } else {
 
                     // Vyzkouset, jestli nemuze nasledovat libovolny znak - pro komentare a stringy. Je to hnus, ale co se da delat :)
                     int len = sb.length() - 1;
@@ -123,29 +125,31 @@ public class LexicalAutomata {
                     n = ka.getNodeAfter(sb.toString());
 
                     if (!(n instanceof ErrorNode)) {
-                        found = false;
+                        if (n instanceof SymbolNode)
+                            found = true;
+                        else
+                            found = false;
                         continue;
                     } else {
                         sb.deleteCharAt(len);
                         sb.append(temp);
                     }
 
-                    if (found == true) {
-                        do {
-                            deleteChar();
-                            i--;
-                            word--;
-                        } while (sb.length() > 1 && !(ka.getNodeAfter(sb.toString()) instanceof SymbolNode));
+                    // Posledni znak zpusobil chybu
+                    deleteChar();
+                    i--;
+                    word--;
+                    // Pokud po odmazani posledniho znaku dostanu symbol je to ok, jinak syntax error
+                    if (sb.length() > 0 && (ka.getNodeAfter(sb.toString()) instanceof SymbolNode)) {
                         Symbol s = getSymbol();
                         s.setLine(line);
+                        // Nastavi zacatek slova ve zdrojaku
                         s.setPos(word - s.getAtt().length());
-                        if (s != null)
-                            fronta.add(s);
-
+                        fronta.add(s);
                         found = false;
                     } else {
                         System.out.println("Syntax error: char " + act + " at line " + line + ", char " + word);
-                        deleteChar();
+                        clearBuffer();
                     }
                 }
             }
@@ -154,8 +158,12 @@ public class LexicalAutomata {
                 s.setLine(line);
                 s.setPos(word - s.getAtt().length());
                 fronta.add(s);
+            } else if (tmp.length() > 0) {
+                System.out.println("B Syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
+                clearBuffer();
             }
-            tmp.delete(0, sb.length());
+
+            tmp.delete(0, tmp.length());
         }
     }
 
@@ -165,6 +173,12 @@ public class LexicalAutomata {
 
     protected void deleteChar() throws AutomatException {
         sb.deleteCharAt(sb.length() - 1);
+    }
+
+    protected void clearBuffer() throws AutomatException {
+        while (sb.length() > 0) {
+            deleteChar();
+        }
     }
 
     protected Symbol getPushBackSymbol() throws AutomatException {
