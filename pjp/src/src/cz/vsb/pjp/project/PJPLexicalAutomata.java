@@ -26,7 +26,7 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         keywords.put("string", new Symbol("type", "string"));
         keywords.put("real", new Symbol("type", "real"));
         keywords.put("boolean", new Symbol("type", "boolean"));
-        keywords.put("mod", new Symbol("arithmeticalb", "mod"));
+        keywords.put("mod", new Symbol("arithmeticala", "mod"));
     }
 
     // TODO Mit moznost cist cisla radku

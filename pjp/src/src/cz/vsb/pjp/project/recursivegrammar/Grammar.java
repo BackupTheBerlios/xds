@@ -192,7 +192,7 @@ public class Grammar {
         next.add("or");
         next.add("relation");
         Value data = E(next);
-        if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getName().equals("or") || s.getName().equals("relation")) {
+        if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getAtt().equals("or") || s.getName().equals("relation")) {
             next = (HashSet<String>) context.clone();
             data = E1(data, next);
         }
@@ -200,11 +200,10 @@ public class Grammar {
     }
 
     public Value E1(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
-        if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getName().equals("or")) {
+        if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getAtt().equals("or") || s.getName().equals("relation")) {
             HashSet<String> next = (HashSet<String>) context.clone();
             in = G(in, next);
-        } else if (s.getName().equals("relation")) {
-            HashSet<String> next = (HashSet<String>) context.clone();
+            next = (HashSet<String>) context.clone();
             in = E2(in, next);
         }
 
@@ -244,7 +243,7 @@ public class Grammar {
             in = in.performOperation(oper, value);
             next = (HashSet<String>) context.clone();
             in = G(in, next);
-        } else if (s.getName().equals("or")) {
+        } else if (s.getAtt().equals("or")) {
             expect("or", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
@@ -259,6 +258,7 @@ public class Grammar {
     public Value E(HashSet<String> context) throws AutomatException, GrammarException, IOException {
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("arithmeticala");
+        next.add("and");
         Value value = H(next);
         next = (HashSet<String>) context.clone();
         value = T1(value, next);
@@ -269,6 +269,13 @@ public class Grammar {
         Symbol tmp = s;
         if (tmp.getName().equals("arithmeticala")) {
             expect("arithmeticala", context);
+            HashSet<String> next = (HashSet<String>) context.clone();
+            Value valueB = H(next);
+            in = in.performOperation(tmp.getAtt(), valueB);
+            next = (HashSet<String>) context.clone();
+            in = T1(in, next);
+        } else if (tmp.getAtt().equals("and")) {
+            expect("and", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value valueB = H(next);
             in = in.performOperation(tmp.getAtt(), valueB);
