@@ -61,12 +61,6 @@ public class PJPLexicalAutomata extends LexicalAutomata {
 
     }
 
-    protected Symbol getPushBackSymbol() throws AutomatException {
-        buffer.deleteCharAt(buffer.length() - 1);
-        Symbol s = super.getPushBackSymbol();
-        return s;
-    }
-
     protected Symbol getSymbol() throws AutomatException {
         Symbol s = super.getSymbol();
         if (s != null) {

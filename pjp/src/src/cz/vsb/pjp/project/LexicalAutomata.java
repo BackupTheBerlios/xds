@@ -69,11 +69,24 @@ public class LexicalAutomata {
         return s;
     }
 
+    /**
+     * True, pokud lze volanim getToken ziskat dalsi symbol, jinak false
+     *
+     * @return
+     * @throws IOException
+     * @throws AutomatException
+     */
     public boolean hasTokens() throws IOException, AutomatException {
         fillQueue();
         return fronta.size() > 0;
     }
 
+    /**
+     * Nacita symboly do fronty
+     *
+     * @throws IOException
+     * @throws AutomatException
+     */
     private void fillQueue() throws IOException, AutomatException {
         if (fronta.size() > 0) return;
         StringBuffer tmp = new StringBuffer();
@@ -167,25 +180,42 @@ public class LexicalAutomata {
         }
     }
 
+    /**
+     * Prida dalsi znak do aktualniho lexemu
+     *
+     * @param a
+     * @throws AutomatException
+     */
     protected void addChar(char a) throws AutomatException {
         sb.append(a);
     }
 
+    /**
+     * Smaze posledni znak z aktualniho lexemu
+     *
+     * @throws AutomatException
+     */
     protected void deleteChar() throws AutomatException {
         sb.deleteCharAt(sb.length() - 1);
     }
 
+    /**
+     * Smaze vsechny znaky aktualniho lexemu
+     *
+     * @throws AutomatException
+     */
     protected void clearBuffer() throws AutomatException {
         while (sb.length() > 0) {
             deleteChar();
         }
     }
 
-    protected Symbol getPushBackSymbol() throws AutomatException {
-        sb.deleteCharAt(sb.length() - 1);
-        return getSymbol();
-    }
-
+    /**
+     * Vraci symbol
+     *
+     * @return
+     * @throws AutomatException
+     */
     protected Symbol getSymbol() throws AutomatException {
         Node n = ka.getNodeAfter(sb.toString());
         Symbol s = null;
@@ -210,7 +240,7 @@ public class LexicalAutomata {
         try {
 
             InputStream in = new FileInputStream("src//rules2.lex");
-            InputStream data = new FileInputStream("src//vtest.txt");
+            InputStream data = new FileInputStream("src//vtest2.txt");
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
             la.setSource(data);
 

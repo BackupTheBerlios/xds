@@ -339,7 +339,7 @@ public class Grammar {
         try {
 
             InputStream in = new FileInputStream("src//rules2.lex");
-            InputStream data = new FileInputStream("src//vtest.txt");
+            InputStream data = new FileInputStream("src//vtest2.txt");
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
             la.setSource(data);
 
