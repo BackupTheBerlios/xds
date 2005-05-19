@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="PJP-Project">
+    <property name="dest" location="classes"/>
+
+    <target name="compile">
+        <mkdir dir="${dest}"/>
+        <javac srcdir="src" destdir="${dest}" />
+        <jar destfile="pjp.jar" basedir="${dest}">
+        <manifest>
+           <attribute name="Main-Class" value="cz/vsb/pjp/project/Main"/>
+         </manifest>
+        </jar>
+
+        <delete dir="${dest}" />
+    </target>
+    
+</project>
