@@ -19,6 +19,7 @@ public class LexicalAutomata {
     private int linew = 0;
     private int wordw = 0;
     public final static String EOF = "@EOF";
+    private boolean returnEOF = false;
 
     public LexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
         ZNKAutomat zn = new ZNKAutomatSymbol(charset);
@@ -30,6 +31,11 @@ public class LexicalAutomata {
             start.addTransition(new ETransition(data[i].getStartingNode()));
         }
         ka = zn.convertToKA();
+    }
+
+    public LexicalAutomata(char[] charset, KAutomat[] data, boolean ret) throws AutomatException {
+        this(charset, data);
+        returnEOF = ret;
     }
 
     public void setSource(InputStream r) {
@@ -81,7 +87,7 @@ public class LexicalAutomata {
                 line++;
                 word = 0;
             } else {
-                fronta.add(new Symbol(EOF, EOF));
+                if (returnEOF) fronta.add(new Symbol(EOF, EOF));
                 return;
             }
 

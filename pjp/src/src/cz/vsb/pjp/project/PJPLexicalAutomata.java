@@ -14,8 +14,8 @@ public class PJPLexicalAutomata extends LexicalAutomata {
     private StringBuffer buffer = new StringBuffer();
     private HashMap<String, Symbol> keywords = new HashMap<String, Symbol>();
 
-    private PJPLexicalAutomata(char[] charset, KAutomat[] data) throws AutomatException {
-        super(charset, data);
+    private PJPLexicalAutomata(char[] charset, KAutomat[] data, boolean retval) throws AutomatException {
+        super(charset, data, retval);
         keywords.put("var", new Symbol("var", "var"));
         keywords.put("and", new Symbol("logic", "and"));
         keywords.put("or", new Symbol("logic", "or"));
@@ -34,7 +34,7 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         Symbol s = super.getToken();
         while (s.getName().equals("komentar")) s = super.getToken();
         if (s.getName().equals("stringval")) {
-            s.setAtt(s.getAtt().substring(1, s.getAtt().length()-1));
+            s.setAtt(s.getAtt().substring(1, s.getAtt().length() - 1));
         }
         if (s.getName().equals("ident")) {
             if (keywords.containsKey(s.getAtt().toLowerCase())) {
@@ -77,6 +77,10 @@ public class PJPLexicalAutomata extends LexicalAutomata {
     }
 
     public static LexicalAutomata getPJPAutomata(InputStream input) {
+        return getPJPAutomata(input, false);
+    }
+
+    public static LexicalAutomata getPJPAutomata(InputStream input, boolean retsym) {
         try {
             BufferedReader in;
             in = new BufferedReader(new InputStreamReader(input));
@@ -169,7 +173,7 @@ public class PJPLexicalAutomata extends LexicalAutomata {
                 }
             }
 
-            return new PJPLexicalAutomata(alphabet.toCharArray(), data);
+            return new PJPLexicalAutomata(alphabet.toCharArray(), data, retsym);
 
         } catch (IOException e) {
             e.printStackTrace();
