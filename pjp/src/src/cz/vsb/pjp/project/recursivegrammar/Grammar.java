@@ -87,11 +87,8 @@ public class Grammar {
             HashSet<String> next = (HashSet<String>) context.clone();
             next.add("semicolon");
             Declaration(next);
-        } else if (s.getName().equals("semicolon")) {
-            expect(";", context);
         }
 
-        // Osetreni konce vyhodnocovani
         expect(";", context);
         Statement(context);
     }
@@ -120,12 +117,11 @@ public class Grammar {
             return Declaration(next);
         } else if (s.getName().equals("colon")) {
             expect(":", context);
-            String type;
-            if (s.getName().equals("type")) {
-                type = s.getAtt();
-                expect("type", context);
-            } else {
-                throw new GrammarException("Expected other token in D");
+            String type = "fake";
+            Symbol tmp = s;
+            expect("type", context);
+            if (tmp.getName().equals("type")) {
+                type = tmp.getAtt();
             }
             return type;
         } else {
@@ -175,7 +171,6 @@ public class Grammar {
     }
 
     public void Assign(String prom, HashSet<String> context) throws AutomatException, IOException, GrammarException {
-        //expect("=", context);
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("comma");
         Value value = Expr(next);
@@ -339,16 +334,19 @@ public class Grammar {
 
     public static void main(String[] args) {
         try {
+            if (args.length > 0) {
+                InputStream in = new FileInputStream("src//rules.lex");
+                InputStream data = new FileInputStream(args[0]);
+                LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
+                la.setSource(data);
 
-            InputStream in = new FileInputStream("src//rules.lex");
-            InputStream data = new FileInputStream("src//vtest.txt");
-            LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
-            la.setSource(data);
-
-            Grammar g = new Grammar(la);
-            HashSet<String> follow = new HashSet<String>();
-            follow.add(LexicalAutomata.EOF);
-            g.Statement(follow);
+                Grammar g = new Grammar(la);
+                HashSet<String> follow = new HashSet<String>();
+                follow.add(LexicalAutomata.EOF);
+                g.Statement(follow);
+            } else {
+                System.out.println("Usage: java -jar pjp.jar file");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

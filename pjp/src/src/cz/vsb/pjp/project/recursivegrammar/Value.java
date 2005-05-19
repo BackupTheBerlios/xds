@@ -76,6 +76,8 @@ public abstract class Value {
             return new BooleanValue(false);
         else if (type.equals("string"))
             return new StringValue("");
+        else if (type.equals("fake"))
+            return new FakeValue();
         else
             throw new UnsupportedOperationException("Unsupported data type");
     }
