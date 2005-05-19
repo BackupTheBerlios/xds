@@ -1,0 +1,65 @@
+{ 
+       PJP project grammar
+       ~~~~~~~~~~~~~~~~~~~
+
+Note: it's not legal to simply edit grammar! Its semantics is hidden in client package.
+}
+
+STATEMENT  : EXPRESSION ';' ;
+
+EXPRESSION : ID_FIRST
+           | DECLARATION
+           | {e} ;
+
+ID_FIRST   : 'ident' ID_FOLLOW ;
+
+ID_FOLLOW  : 'assign' AFORMULA
+           | FUNCTION_CALL ;
+
+AFORMULA   :  DXPR AG'                      [1 0]  ;
+
+AG'        :  'relation' DXPR AG'           [2 0 1]
+           |  {e};
+
+DXPR       :  T1 E'                         [1 0] ;
+
+E'         :  'arithmeticalb' T1 E'         [2 0 1]
+           |  '.' T1 E'                     [2 0 1]
+           |  'or' T1 E'                    [2 0 1]
+           |  {e};
+
+T1         :  OPERAND T1'                        [ 1 0 ];
+
+T1'        :  'arithmeticala' OPERAND T1'
+           |  'mod' OPERAND T1'
+           |  'and' OPERAND T1'
+           |  {e} ;
+
+OPERAND    : '(' AFORMULA ')'
+           | 'numberint'
+           | 'numberdouble'
+           | 'stringval'
+           | 'ident'
+           | 'not' OPERAND
+           | 'arithmeticalb@unary-' OPERAND
+           | BOOL_CONST ;
+
+BOOL_CONST : 'true'
+           | 'false' ;
+
+DECLARATION : 'var' DA ':' VARTYPE          [ 0 3 2 1 ];
+
+VARTYPE    : 'type' ;
+
+DA         : 'ident' DA' ;
+
+DA'        : ',' DA
+           | {e};
+
+FUNCTION_CALL : '(' ARGS ')' ;
+
+ARGS       : AFORMULA ARG'
+           | {e} ;  { function w/o arguments support }
+
+ARG'       : {e}
+           | ',' ARGS  [ 0 1 ];
