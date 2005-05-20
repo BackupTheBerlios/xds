@@ -14,8 +14,8 @@ public class Main {
         try {
             if (args.length > 1) {
                 if (args[0].equals("a")) {
-
-                    InputStream in = new FileInputStream("src//rules.lex");
+                    System.out.println("Using recursive descent: ");
+                    InputStream in = new FileInputStream("data//rules.lex");
                     InputStream data = new FileInputStream(args[1]);
                     LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
                     la.setSource(data);
@@ -25,11 +25,15 @@ public class Main {
                     follow.add(LexicalAutomata.EOF);
                     g.Statement(follow);
                 } else {
-                    String[] params = {"grammar1.txt", "rules.lex"};
+                    System.out.println("Using stack automata: ");
+                    String[] params = {"data//grammar1.txt", args[1]};
                     cz.vsb.pjp.project.grammar.Test.main(params);
                 }
             } else {
                 System.out.println("Usage: java -jar pjp.jar [a | b] sourcefile");
+                System.out.println("-----------------------------");
+                System.out.println("a - recursive descent");
+                System.out.println("b - stack automata");
             }
 
         } catch (Exception e) {

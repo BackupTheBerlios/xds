@@ -4,7 +4,6 @@ import cz.vsb.uti.sch110.automata.AutomatException;
 import cz.vsb.pjp.project.LexicalAutomata;
 import cz.vsb.pjp.project.Symbol;
 import cz.vsb.pjp.project.NoMoreTokensException;
-import cz.vsb.pjp.project.PJPLexicalAutomata;
 
 import java.io.*;
 import java.util.*;
@@ -16,6 +15,7 @@ public class Grammar {
     LexicalAutomata l;
     Symbol s;
     HashMap<String, Value> symbolTable = new HashMap<String, Value>();
+    private boolean errorOccured = false;
 
     public Grammar(LexicalAutomata l) throws AutomatException, IOException, NoMoreTokensException {
         this.l = l;
@@ -24,7 +24,7 @@ public class Grammar {
             public Object ExecuteFunction(AbstractList<Value> values) {
                 int size = values.size();
                 for (int i = 0; i < size; i++) {
-                    System.out.println(values.get(i).toString());
+                    if (!errorOccured) System.out.println(values.get(i).toString());
                 }
                 return null;
             }
@@ -36,7 +36,7 @@ public class Grammar {
                 int size = values.size();
                 for (int i = 0; i < size; i++) {
                     try {
-                        values.get(i).setValue(br.readLine());
+                        if (!errorOccured) values.get(i).setValue(br.readLine());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -52,6 +52,7 @@ public class Grammar {
                 s = l.getToken();
             else {
                 System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
+                errorOccured = true;
                 // Synchronizace
                 while (!context.contains((s = l.getToken()).getName())) ;
             }
@@ -62,6 +63,7 @@ public class Grammar {
 
     public void synchro(HashSet<String> context) throws IOException, GrammarException, AutomatException {
         System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition());
+        errorOccured = true;
         try {
             while (!context.contains(s.getName())) {
                 s = l.getToken();
@@ -89,6 +91,7 @@ public class Grammar {
             Declaration(next);
         }
 
+        context.add("semicolon");
         expect(";", context);
         Statement(context);
     }
@@ -104,7 +107,7 @@ public class Grammar {
         } else {
             symbolTable.put(tmp.getAtt().toLowerCase(), Value.getDefaultValue(type));
         }
-        System.out.println(tmp.getAtt() + " - " + type);
+        //System.out.println(tmp.getAtt() + " - " + type);
         return type;
     }
 
@@ -138,7 +141,7 @@ public class Grammar {
             Assign(name, next);
         } else if (tmp.getAtt().equals("(")) {
             expect("(", context);
-            Value v = symbolTable.get(name);
+            Value v = symbolTable.get(name.toLowerCase());
             if (v != null && v.getType().equals("function")) {
                 Function f = (Function) v;
                 HashSet<String> next = (HashSet<String>) context.clone();
@@ -180,7 +183,7 @@ public class Grammar {
         old = symbolTable.get(prom);
         if (old != null) {
             old.setValue(value);
-            System.out.println(prom + " - " + value);
+            //System.out.println(prom + " - " + value);
         } else
             throw new GrammarException("Variable " + prom + " is not defined");
     }
@@ -286,7 +289,20 @@ public class Grammar {
     }
 
     public Value H1(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+        context.add("leftp");
+        context.add("ident");
+        context.add("true");
+        context.add("false");
+        context.add("numberint");
+        context.add("numberdouble");
         if (!(s.getName().equals("leftp") || s.getName().equals("ident") || s.getName().equals("true") || s.getName().equals("false") || s.getName().equals("numberint") || s.getName().equals("numberdouble"))) synchro(context);
+        context.remove("leftp");
+        context.remove("ident");
+        context.remove("true");
+        context.remove("false");
+        context.remove("numberint");
+        context.remove("numberdouble");
+
         Symbol tmp = s;
         if (s.getName().equals("leftp")) {
             expect("(", context);
@@ -325,7 +341,7 @@ public class Grammar {
         if (tmp.getAtt().equals("-")) {
             expect("-", context);
             HashSet<String> next = (HashSet<String>) context.clone();
-            return H1(next).performUnaryOperation("-");
+            return H(next).performUnaryOperation("-");
         } else if (tmp.getName().equals("not")) {
             expect("not", context);
             HashSet<String> next = (HashSet<String>) context.clone();
@@ -336,27 +352,6 @@ public class Grammar {
         } else {
             HashSet<String> next = (HashSet<String>) context.clone();
             return H1(next);
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            if (args.length > 0) {
-                InputStream in = new FileInputStream("src//rules.lex");
-                InputStream data = new FileInputStream(args[0]);
-                LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in, true);
-                la.setSource(data);
-
-                Grammar g = new Grammar(la);
-                HashSet<String> follow = new HashSet<String>();
-                follow.add(LexicalAutomata.EOF);
-                g.Statement(follow);
-            } else {
-                System.out.println("Usage: java -jar pjp.jar file");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

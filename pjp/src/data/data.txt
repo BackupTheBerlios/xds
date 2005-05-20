@@ -1,2 +1,0 @@
-var mod a = (10 <> 5e11)	+15 not and ; { aasdf }
-write("Tze  c	aasdfa");

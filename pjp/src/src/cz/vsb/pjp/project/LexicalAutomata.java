@@ -149,9 +149,11 @@ public class LexicalAutomata {
                     }
 
                     // Posledni znak zpusobil chybu
-                    deleteChar();
-                    i--;
-                    word--;
+                    if (sb.length() > 1) {
+                        deleteChar();
+                        i--;
+                        word--;
+                    }
                     // Pokud po odmazani posledniho znaku dostanu symbol je to ok, jinak syntax error
                     if (sb.length() > 0 && (ka.getNodeAfter(sb.toString()) instanceof SymbolNode)) {
                         Symbol s = getSymbol();
@@ -161,7 +163,8 @@ public class LexicalAutomata {
                         fronta.add(s);
                         found = false;
                     } else {
-                        System.err.println("Syntax error: char " + act + " at line " + line + ", char " + word);
+                        System.err.println("Lex: syntax error: char " + act + " at line " + line + ", char " + word);
+
                         clearBuffer();
                     }
                 }
@@ -172,7 +175,7 @@ public class LexicalAutomata {
                 s.setPos(word - s.getAtt().length());
                 fronta.add(s);
             } else if (tmp.length() > 0) {
-                System.err.println("Syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
+                System.err.println("Lex: syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
                 clearBuffer();
             }
 
