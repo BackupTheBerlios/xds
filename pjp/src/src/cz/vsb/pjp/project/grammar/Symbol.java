@@ -45,5 +45,5 @@ public abstract class Symbol implements Comparable {
     /**
      * Jmeno symbolu.
      */
-    private String name;
+    protected String name;
 }

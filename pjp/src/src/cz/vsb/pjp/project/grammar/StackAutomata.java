@@ -17,7 +17,7 @@ public class StackAutomata {
         this.table = table;
     }
 
-    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g, GrammarOps ops, StackCodeProcessor proc)
+    public Stack<Rule> processWord(LexicalAutomata lex, Grammar g, GrammarOps ops, ClientStackCodeProcessor proc)
             throws SyntaxErrorException, IOException, AutomatException {
         Stack<Rule> outputStack = new Stack<Rule>();
 
@@ -66,9 +66,7 @@ public class StackAutomata {
                     while (i.hasNext()) {
                         Terminal t = (Terminal)i.next();
 
-                        // TODO: this is *VERY* bad!
-                        // tohle je samozrejme nesmysl, ktery slouzi pouze k otestovani automatu
-                        if (t.getName().equals(sym.getName()) /*|| t.getName().equals(sym.getAtt())*/) {
+                        if (t.getName().equals(sym.getName()) || t.getName().equals(sym.getAtt())) {
                             term = t;
                             break;
                         }
@@ -91,7 +89,7 @@ public class StackAutomata {
                 // is the decomposition table filled-in at given coordinates?
                 if (r == null) {
                     throw new SyntaxErrorException("No entry for "+ new Pair<Terminal, Nonterminal>(term, (Nonterminal)b) +
-                            ". Expected one of: " + ops.first(b), -1);
+                            ". Expected one of: " + ops.first((Nonterminal)b), lex.getLine());
                 }
 
                 //System.out.println("Using rule " + sym.getAtt() + ", " + r);
@@ -130,9 +128,9 @@ public class StackAutomata {
                     wantNextLexem = true;
                     //System.out.println("Removed terminal " + term + ": " + sym.getAtt() +". Requesting lex to pass new lexem.");
                 } else
-                    throw new SyntaxErrorException("Expected only " + b, -1);
+                    throw new SyntaxErrorException("Expected only " + b, lex.getLine());
             } else
-                throw new SyntaxErrorException("Something is totally wrong", -1);
+                throw new SyntaxErrorException("Something is totally wrong", lex.getLine());
         }
 
         return outputStack;

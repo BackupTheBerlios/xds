@@ -1,21 +1,15 @@
 package cz.vsb.pjp.project.grammar.client;
 
-import cz.vsb.pjp.project.grammar.ExecuteStackItem;
-import cz.vsb.pjp.project.grammar.Symbol;
+import cz.vsb.pjp.project.grammar.*;
 
 import java.util.Stack;
 import java.util.TreeMap;
 import java.io.*;
 
-// TODO: Chybne parsovani vyrazu "=", "+" ve write
-// TODO: Lex-komentare
-// TODO: Uvozovky z retezcu!
-// TODO: vsechno je malym??!!
-// TODO: logicke operatory
-// TODO: concat
-public class StackCodeProcessor {
-    Stack<ExecuteStackItem> pool = new Stack<ExecuteStackItem>();
-    TreeMap<String, Variable> symTable = new TreeMap<String, Variable>();
+public class StackCodeProcessor extends ClientStackCodeProcessor{
+    protected Stack<ExecuteStackItem> pool = new Stack<ExecuteStackItem>();
+    protected TreeMap<String, Variable> symTable = new TreeMap<String, Variable>();
+    private boolean willBeUnary = false;
 
     public static final int FUNCTION_CALL   = 0;
     public static final int IDENTIFIER      = 1;
@@ -32,24 +26,31 @@ public class StackCodeProcessor {
         if (n.getName().compareTo(";") == 0)
             return false;
 
+        if (n instanceof Terminal && ((Terminal)n).getMapString() != null)
+            willBeUnary = true;
+
         return true;
     }
 
     public ExecuteStackItem translate(cz.vsb.pjp.project.Symbol n) {
-        if (n.getAtt().equals("write") || n.getAtt().equals("read"))
+        if (willBeUnary) {
+            willBeUnary = false;
+            return new ExecuteStackItem(OPERATION, null, "unary-");
+        }
+        if (n.getAtt().equalsIgnoreCase("write") || n.getAtt().equalsIgnoreCase("read"))
             return new ExecuteStackItem(FUNCTION_CALL, n.getAtt(), null);
         if (n.getName().equals("ident"))
-            return new ExecuteStackItem(IDENTIFIER, n.getAtt(), null);
+            return new ExecuteStackItem(IDENTIFIER, n.getAtt().toLowerCase(), null);
         if (n.getName().equals("numberint"))
             return new ExecuteStackItem(CONST_INTEGER, null, new Double(n.getAtt()));
         if (n.getName().equals("numberdouble"))
             return new ExecuteStackItem(CONST_DOUBLE, null, new Double(n.getAtt()));
-        if (n.getName().equals("string"))
-            return new ExecuteStackItem(CONST_STRING, n.getName(), n.getAtt().replaceAll("\"", ""));
-        if (n.getName().equals("arithmetical") || n.getAtt().equals(".") || n.getAtt().equals("relation") ||
+        if (n.getName().equals("stringval"))
+            return new ExecuteStackItem(CONST_STRING, n.getName(), n.getAtt());
+        if (n.getName().startsWith("arithmetical") || n.getAtt().equals(".") || n.getName().equals("relation") ||
             n.getName().equals("logic"))
             return new ExecuteStackItem(OPERATION, n.getName(), n.getAtt());
-        if (n.getName().equals("colon"))
+        if (n.getName().equals("assign"))
             return new ExecuteStackItem(ASSIGNMENT, null, null);
         if (n.getAtt().equals(","))
             return new ExecuteStackItem(FUNCTION_PARAM, null, null);
@@ -65,7 +66,7 @@ public class StackCodeProcessor {
     }
 
     public void processCode(Stack<ExecuteStackItem> s) {
-        System.out.println("PROCESSING: " + s);
+        //System.out.println("PROCESSING: " + s);
 
         while (true) {
             if (s.isEmpty())
@@ -148,13 +149,16 @@ public class StackCodeProcessor {
     protected void processFunction(ExecuteStackItem function) {
         if (function.type == OPERATION) {
             // unary operations
-            if (function.value.equals("not") || function.value.equals("unary")) {
+            if (function.value.equals("not") || function.value.equals("unary-")) {
+                if (!needStack(1))
+                    return;
+
                 ExecuteStackItem a = pool.pop();
 
                 fillValue(a);
 
                 if (a.value == null) {
-                    runtimeError("Operation '" + function.value + " " + a.data + "' not valid for that data type", false);
+                    runtimeError("Operation '" + function.value + " " + a.data + "' not valid for this data type", false);
                     return;
                 }
 
@@ -164,11 +168,20 @@ public class StackCodeProcessor {
                             new Boolean(!((Boolean)a.value).booleanValue())));
                         return;
                     }
-                } else if (function.value.equals("unary"))  {
-
+                } else if (function.value.equals("unary-"))  {
+                    if (expectType(a, CONST_INTEGER) || expectType(a, CONST_DOUBLE)) {
+                        pool.push(new ExecuteStackItem(a.type, null,
+                            new Double(((Double)a.value).doubleValue() * -1.0)));
+                        return;
+                    }
                 }
 
+                runtimeError("Unary operation '" + function + "' not allowed for this data type", false);
+                return;
             }
+
+            if (!needStack(2))
+                return;
 
             ExecuteStackItem a = pool.pop();
             ExecuteStackItem b = pool.pop();
@@ -177,36 +190,36 @@ public class StackCodeProcessor {
             fillValue(b);
 
             if (a.value == null || b.value == null) {
-                runtimeError("Operation '" + a.data + " " + function.value + " " + b.data + "' not valid for that data type", false);
+                runtimeError("Operation '" + a.data + " " + function.value + " " + b.data + "' not valid for these data types", false);
                 return;
             }
 
             if (function.value.equals("mod")) {
-                if (expectType(a, b, CONST_DOUBLE) || expectType(a, b, CONST_INTEGER)) {
+                if (expectType(a, b, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() % ((Double)a.value).doubleValue())));
                     return;
                 }
             } else if (function.value.equals("/")) {
-                if (expectType(a, b, CONST_DOUBLE) || expectType(a, b, CONST_INTEGER)) {
+                if (expectType(a, b, CONST_DOUBLE, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() / ((Double)a.value).doubleValue())));
                     return;
                 }
             } else if (function.value.equals("+")) {
-                if (expectType(a, b, CONST_DOUBLE) || expectType(a, b, CONST_INTEGER)) {
+                if (expectType(a, b, CONST_DOUBLE, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() + ((Double)a.value).doubleValue())));
                     return;
                 }
             } else if (function.value.equals("-")) {
-                if (expectType(a, b, CONST_DOUBLE) || expectType(a, b, CONST_INTEGER)) {
+                if (expectType(a, b, CONST_DOUBLE, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() - ((Double)a.value).doubleValue())));
                     return;
                 }
             } else if (function.value.equals("*")) {
-                if (expectType(a, b, CONST_DOUBLE) || expectType(a, b, CONST_INTEGER)) {
+                if (expectType(a, b, CONST_DOUBLE, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() * ((Double)a.value).doubleValue())));
                     return;
@@ -217,8 +230,6 @@ public class StackCodeProcessor {
                         new String( (String)b.value + (String)a.value )));
                     return;
                 }
-                //else
-                //    runtimeError("Can't concatenate variables that aren't both strings", false);
             } else if (function.value.equals("and")) {
                 if (expectType(a, b, CONST_BOOL)) {
                     pool.push(new ExecuteStackItem(CONST_BOOL, null,
@@ -231,12 +242,27 @@ public class StackCodeProcessor {
                         new Boolean(((Boolean)b.value).booleanValue() || ((Boolean)a.value).booleanValue())));
                     return;
                 }
+            } else if (function.value.equals("<")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == -1)));
+                return;
+            } else if (function.value.equals(">")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == 1)));
+                return;
+            } else if (function.value.equals("<=")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == -1 || b.compareTo(a) == 0)));
+                return;
+            } else if (function.value.equals(">=")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == 1 || b.compareTo(a) == 0)));
+                return;
+            } else if (function.value.equals("=")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == 0)));
+                return;
             } else {
                 runtimeError("Unknown binary operation: " + function, false);
                 return;
             }
 
-            runtimeError("Operation '" + function + "' not allowed to this data type", false);
+            runtimeError("Operation '" + function + "' not allowed for this data type", false);
         }
     }
 
@@ -260,7 +286,6 @@ public class StackCodeProcessor {
                         System.out.print(((Double)param.value).intValue());
                     else
                         System.out.print(param.value);
-
                 }
             }
             System.out.println();
@@ -313,7 +338,7 @@ public class StackCodeProcessor {
         }
     }
 
-    private void runtimeError(String err, boolean critical) {
+    private static void runtimeError(String err, boolean critical) {
         if (critical)
             System.err.println("*** CRITICAL ERROR: " + err);
         else
@@ -327,8 +352,10 @@ public class StackCodeProcessor {
             if (v == null)
                 return;
 
-            if (v.type == Variable.TYPE_REAL)
+            if (v.type == Variable.TYPE_REAL) {
                 a.value = v.value;
+                a.type = CONST_DOUBLE;
+            }
             else if (v.type == Variable.TYPE_INTEGER) {
                 if (v.value instanceof Double)
                     a.value = new Double(((Double)v.value).intValue());
@@ -336,8 +363,13 @@ public class StackCodeProcessor {
                     a.value = new Double(((Integer)v.value).intValue());
 
                 a.type = CONST_INTEGER;
-            } else if (v.type == Variable.TYPE_BOOLEAN)
+            } else if (v.type == Variable.TYPE_STRING) {
                 a.value = v.value;
+                a.type = CONST_STRING;
+            } else if (v.type == Variable.TYPE_BOOLEAN) {
+                a.value = v.value;
+                a.type = CONST_BOOL;
+            }
         }
     }
 
@@ -353,15 +385,38 @@ public class StackCodeProcessor {
 
         if (t == -1) {
             Variable v=getSafeVariable(a.data);
-            if (v != null) {
+            if (v != null)
                 t = v.toConstType();
-            }
         }
 
         return t==type;
     }
 
+    private boolean expectType(ExecuteStackItem a, ExecuteStackItem b, int t1, int t2) {
+        return (expectType(a, t1) || expectType(a, t2)) && (expectType(b, t1) || expectType(b, t2));
+    }
+
     private boolean expectType(ExecuteStackItem a, ExecuteStackItem b, int type) {
         return expectType(a, type) && expectType(b, type);
+    }
+
+    public static int compareTwoStackItems(ExecuteStackItem a, ExecuteStackItem b) {
+        // perform int-double (and vice versa) comparsion
+        if (a.type == CONST_INTEGER && b.type == CONST_DOUBLE ||
+            a.type == CONST_DOUBLE && b.type == CONST_INTEGER)
+            return ((Double)a.value).compareTo(((Double)b.value));
+
+        runtimeError("Unable to compare: incompatible types", false);
+        return 0;
+    }
+
+
+    private boolean needStack(int items) {
+        if (pool.size() < items) {
+            runtimeError("Internal stack inconsistency", true);
+            return false;
+        }
+
+        return true;
     }
 }

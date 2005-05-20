@@ -6,6 +6,7 @@ package cz.vsb.pjp.project.grammar;
  * @author Miroslav.Benes@vsb.cz
  */
 public class Terminal extends Symbol {
+    protected String map;
     /**
      * Vytvori instanci terminalniho symbolu.
      *
@@ -13,5 +14,14 @@ public class Terminal extends Symbol {
      */
     public Terminal(String name) {
         super(name);
+
+        if (name.contains("@")) {
+            this.name = name.split("@")[0];
+            map = name.split("@")[1];
+        }
+    }
+
+    public String getMapString() {
+        return map;
     }
 }

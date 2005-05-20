@@ -66,8 +66,9 @@ public class DerivationTree<T> {
 
         protected void addToStack(Stack<ExecuteStackItem> s) {
             if (children.isEmpty()) {
-                if (data instanceof Terminal && value != null)
+                if (data instanceof Terminal && value != null) {
                     s.push((ExecuteStackItem)value);//new ExecuteStackItem(data, value));
+                }
                 return;
             }
 

@@ -15,14 +15,14 @@ public class Test {
         // vytvorime prazdnou gramatiku
         Grammar grammar;
 
-        if (args.length != 2) {
-            System.err.println("Specify 2 parameters please.");
+        if (args.length != 3) {
+            System.err.println("Specify 3 parameters please.");
             return;
         }
 
         // nacteme jeji obsah ze souboru
         try {
-            GrammarReader inp = new GrammarReader(new FileReader(args[0]));
+            GrammarReader inp = new GrammarReader(new FileReader(args[1]));
             grammar = inp.read();
             GrammarOps go = new GrammarOps(grammar);
 
@@ -34,15 +34,16 @@ public class Test {
 
             // set up lexical analyser
 
-            InputStream in = new FileInputStream("rules.lex");
-            InputStream data = new FileInputStream(args[1]);
+            InputStream in = new FileInputStream(args[0]);
             LexicalAutomata la = PJPLexicalAutomata.getPJPAutomata(in);
+
+            InputStream data = new FileInputStream(args[2]);
             la.setSource(data);
 
             sa.processWord(la, grammar, go, proc);
         } catch (GrammarParseException e) {
-            // chyba pri analyze textu
-            System.err.println("Error(" + e.getLineNumber() + ") " + e.getMessage());
+            // chyba pri analyze textu gramatiky
+            System.err.println("Grammar parse exception: Line " + e.getLineNumber() + " - " + e.getMessage());
             return;
         } catch (InvalidGrammarTypeException e) {
             System.err.println("Can't build decomposition table: not an LL1 grammar?");
@@ -50,7 +51,7 @@ public class Test {
             return;
         } catch (IOException e) {
             // chyba vstupu/vystupu
-            System.err.println("Error: " + e.getMessage());
+            System.err.println("I/O Error: " + e.getMessage());
             return;
         } catch (SyntaxErrorException e) {
             System.err.println("SYNTAX ERROR at line " + e.getLineNumber() + ": " + e.getMessage());

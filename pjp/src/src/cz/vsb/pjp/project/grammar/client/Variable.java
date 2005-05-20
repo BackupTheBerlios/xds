@@ -2,7 +2,7 @@ package cz.vsb.pjp.project.grammar.client;
 
 public class Variable implements Comparable {
     protected String name;
-    protected Object value;
+    protected Comparable value;
     protected int type;
 
     protected final static int TYPE_STRING = 0;
@@ -12,7 +12,7 @@ public class Variable implements Comparable {
 
     private final static String[] types = { "string", "integer", "real", "boolean" };
 
-    public Variable(String type, String name, Object value) {
+    public Variable(String type, String name, Comparable value) {
         for (int i=0; i<types.length; i++)
             if (types[i].equalsIgnoreCase(type)) {
                 this.type = i;
@@ -53,4 +53,5 @@ public class Variable implements Comparable {
 
         return -1;
     }
+
 }
