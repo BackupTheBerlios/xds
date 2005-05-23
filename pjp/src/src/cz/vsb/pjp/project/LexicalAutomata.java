@@ -60,6 +60,13 @@ public class LexicalAutomata {
         return wordw;
     }
 
+    /**
+     * Vraci nasledujici symbol
+     * @return
+     * @throws IOException
+     * @throws AutomatException
+     * @throws NoMoreTokensException Pokud symboly dosly :)
+     */
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         fillQueue();
         if (fronta.size() == 0) throw new NoMoreTokensException();
@@ -256,6 +263,9 @@ public class LexicalAutomata {
         }
     }
 
+    /**
+     * Trida rozsiruje bezny konecny automat o specifikaci chyboveho stavu a dokaze rozlisovat, jakeho typu je konecny stav (jaky symbol ma vracet)
+     */
     private class ZNKAutomatSymbol extends ZNKAutomat {
         ZNKAutomatSymbol(char[] charset) {
             super(charset);

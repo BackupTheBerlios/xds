@@ -29,7 +29,6 @@ public class PJPLexicalAutomata extends LexicalAutomata {
         keywords.put("mod", new Symbol("arithmeticala", "mod"));
     }
 
-    // TODO Mit moznost cist cisla radku
     public Symbol getToken() throws IOException, AutomatException, NoMoreTokensException {
         Symbol s = super.getToken();
         while (s.getName().equals("komentar")) s = super.getToken();
@@ -45,9 +44,6 @@ public class PJPLexicalAutomata extends LexicalAutomata {
     }
 
     protected void addChar(char a) throws AutomatException {
-        /**
-         * Osetreni bilych znaku v retezcich - neni mozne je ignorovat jako bile znaky mimo retezce
-         */
         buffer.append(a);
         // Osetreni hromadnych znaku
         if (Character.isWhitespace(a)) a = '\'';
