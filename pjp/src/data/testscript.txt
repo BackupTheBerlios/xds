@@ -39,5 +39,3 @@ write("Performing STRING tests...");
 write((a.(b."+").c="AB+CCCC") or not (a.b<a.b));
 
 ;;;;;;;;;
-
-

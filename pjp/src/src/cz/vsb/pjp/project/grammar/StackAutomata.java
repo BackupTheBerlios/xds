@@ -1,7 +1,6 @@
 package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.LexicalAutomata;
-import cz.vsb.pjp.project.grammar.client.StackCodeProcessor;
 import cz.vsb.uti.sch110.automata.AutomatException;
 
 import java.util.Stack;
@@ -53,7 +52,7 @@ public class StackAutomata {
                     else
                         sym = lex.getToken();
                 } catch (Exception e) {
-                    System.err.println("Something in sch110's package went wrong. Maybe it was " + e);
+                    System.out.println("Something in sch110's package went wrong. Maybe it was " + e);
                     e.printStackTrace();
                     return outputStack;
                 }

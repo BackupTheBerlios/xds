@@ -41,7 +41,7 @@ OPERAND    : '(' AFORMULA ')'
            | 'stringval'
            | 'ident'
            | 'not' OPERAND
-           | 'arithmeticalb@unary-' OPERAND
+           | 'arithmeticalb@unary-' OPERAND  { mapping used here! }
            | BOOL_CONST ;
 
 BOOL_CONST : 'true'

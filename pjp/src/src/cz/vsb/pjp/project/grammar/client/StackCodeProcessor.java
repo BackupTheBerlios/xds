@@ -314,6 +314,8 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
                                 v.value = str;
                             else if (v.type == Variable.TYPE_REAL)
                                 v.value = new Double(str);
+                            else if (v.type == Variable.TYPE_BOOLEAN)
+                                v.value = new Boolean(str);
                             else
                                 v.value = new Integer(str);
                         } catch (IOException e) {
@@ -328,10 +330,6 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
                     pool.empty();
                 }
             }
-        } else if (func.data.equalsIgnoreCase("write")) {
-            while (!pool.isEmpty()) {
-
-            }
         } else {
             runtimeError("Unknown function: '" + func.data +"'", false);
             pool.empty();
@@ -340,9 +338,9 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
 
     private static void runtimeError(String err, boolean critical) {
         if (critical)
-            System.err.println("*** CRITICAL ERROR: " + err);
+            System.out.println("*** CRITICAL ERROR: " + err);
         else
-            System.err.println("*** RUNTIME ERROR: " + err);
+            System.out.println("*** RUNTIME ERROR: " + err);
     }
 
     private void fillValue(ExecuteStackItem a) {

@@ -43,20 +43,20 @@ public class Test {
             sa.processWord(la, grammar, go, proc);
         } catch (GrammarParseException e) {
             // chyba pri analyze textu gramatiky
-            System.err.println("Grammar parse exception: Line " + e.getLineNumber() + " - " + e.getMessage());
+            System.out.println("Grammar parse exception: Line " + e.getLineNumber() + " - " + e.getMessage());
             return;
         } catch (InvalidGrammarTypeException e) {
-            System.err.println("Can't build decomposition table: not an LL1 grammar?");
-            System.err.println("--- ambiguous table key was " + e.getMessage());
+            System.out.println("Can't build decomposition table: not an LL1 grammar?");
+            System.out.println("--- ambiguous table key was " + e.getMessage());
             return;
         } catch (IOException e) {
             // chyba vstupu/vystupu
-            System.err.println("I/O Error: " + e.getMessage());
+            System.out.println("I/O Error: " + e.getMessage());
             return;
         } catch (SyntaxErrorException e) {
-            System.err.println("SYNTAX ERROR at line " + e.getLineNumber() + ": " + e.getMessage());
+            System.out.println("SYNTAX ERROR at line " + e.getLineNumber() + ": " + e.getMessage());
         } catch (AutomatException e) {
-            System.err.println("Lexical automaton has reported an exception: " + e.getMessage());
+            System.out.println("Lexical automaton has reported an exception: " + e.getMessage());
         }
     }
 }
