@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.*;
 
 /**
+ * Trida rekurzivnim sestupem implementuje gramatiku.
+ *
  * @author Vladimir Schafer - 15.5.2005 - 10:40:34
  */
 public class Grammar {
@@ -16,10 +18,18 @@ public class Grammar {
     Symbol s;
     HashMap<String, Value> symbolTable = new HashMap<String, Value>();
     private boolean errorOccured = false;
+    private int line = 0;
+    private int word = 0;
+
+    public String getPos() {
+        return new StringBuilder(" at line ").append(line).append(", position ").append(word).toString();
+    }
 
     public Grammar(LexicalAutomata l) throws AutomatException, IOException, NoMoreTokensException {
         this.l = l;
         s = l.getToken();
+        line = s.getLine();
+        word = s.getPos();
         symbolTable.put("write", new Function() {
             public Object ExecuteFunction(AbstractList<Value> values) {
                 int size = values.size();
@@ -39,6 +49,9 @@ public class Grammar {
                         if (!errorOccured) values.get(i).setValue(br.readLine());
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (NumberFormatException e) {
+                        errorOccured = true;
+                        System.err.println("Error: Input should have been " + values.get(i).getType() + getPos());
                     }
                 }
                 return null;
@@ -48,8 +61,11 @@ public class Grammar {
 
     public void expect(String sym, HashSet<String> context) throws AutomatException, IOException {
         try {
-            if (s.getName().equals(sym) || s.getAtt().equals(sym))
+            if (s.getName().equals(sym) || s.getAtt().equals(sym)) {
                 s = l.getToken();
+                line = s.getLine();
+                word = s.getPos();
+            }
             else {
                 System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
                 errorOccured = true;
@@ -103,11 +119,12 @@ public class Grammar {
         String type = D(next);
 
         if (symbolTable.containsKey(tmp.getAtt().toLowerCase())) {
-            throw new GrammarException("Variable is already defined");
+            System.err.println("Error: Variable " + tmp.getAtt() + " is already defined" + getPos());
+            errorOccured = true;
+            type = "fake";
         } else {
             symbolTable.put(tmp.getAtt().toLowerCase(), Value.getDefaultValue(type));
         }
-        //System.out.println(tmp.getAtt() + " - " + type);
         return type;
     }
 
@@ -222,7 +239,13 @@ public class Grammar {
             //value = E1(value);
             next = (HashSet<String>) context.clone();
             value = G(value, next);
-            in = in.performOperation(tmp.getAtt(), value);
+            try {
+                in = in.performOperation(tmp.getAtt(), value);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = E2(in, next);
         }
@@ -236,21 +259,39 @@ public class Grammar {
             expect("arithmeticalb", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
+            try {
             in = in.performOperation(oper, value);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
         } else if (s.getName().equals("concat")) {
             expect(".", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
+            try {
             in = in.performOperation(oper, value);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
         } else if (s.getAtt().equals("or")) {
             expect("or", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
+            try {
             in = in.performOperation(oper, value);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
         }
@@ -274,14 +315,26 @@ public class Grammar {
             expect("arithmeticala", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value valueB = H(next);
+            try {
             in = in.performOperation(tmp.getAtt(), valueB);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = T1(in, next);
         } else if (tmp.getAtt().equals("and")) {
             expect("and", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value valueB = H(next);
-            in = in.performOperation(tmp.getAtt(), valueB);
+            try {
+                in = in.performOperation(tmp.getAtt(), valueB);
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
             next = (HashSet<String>) context.clone();
             in = T1(in, next);
         }
@@ -317,8 +370,12 @@ public class Grammar {
             Value v = symbolTable.get(val);
             if (v != null)
                 return v;
-            else
-                throw new GrammarException("Variable " + tmp.getAtt() + " doesn't exist");
+            else {
+                System.err.println("Error: Variable " + tmp.getAtt() + " isn't declared" + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
+
         } else if (s.getName().equals("true")) {
             expect("true", context);
             return new BooleanValue(true);
@@ -341,11 +398,23 @@ public class Grammar {
         if (tmp.getAtt().equals("-")) {
             expect("-", context);
             HashSet<String> next = (HashSet<String>) context.clone();
-            return H(next).performUnaryOperation("-");
+            try {
+                return H(next).performUnaryOperation("-");
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
         } else if (tmp.getName().equals("not")) {
             expect("not", context);
             HashSet<String> next = (HashSet<String>) context.clone();
-            return H1(next).performUnaryOperation("not");
+            try {
+                return H(next).performUnaryOperation("not");
+            } catch (UnsupportedOperationException e) {
+                System.err.println("Error: "+e.getMessage() + getPos());
+                errorOccured = true;
+                return new FakeValue();
+            }
         } else if (tmp.getName().equals("stringval")) {
             expect("stringval", context);
             return new StringValue(tmp.getAtt());
