@@ -26,7 +26,7 @@ public class Main {
                     g.Statement(follow);
                 } else {
                     System.out.println("Using stack automata: ");
-                    String[] params = {"data//grammar1.txt", args[1]};
+                    String[] params = {"data//rules.lex", "data//main-grammar.txt", args[1] };
                     cz.vsb.pjp.project.grammar.Test.main(params);
                 }
             } else {
