@@ -4,9 +4,8 @@
 
 write("Welcome to test script");
 write("~~~~~~~~~~~~~~~~~~~~~~");
-write();
 write("There should be neither Runtime error nor FALSE test result reported.");
-write();
+write("~~~~~~~~~~~~~~~~~~~~~~");
 
 // ------ declare some stuff
 var br:boolean;
@@ -30,7 +29,7 @@ WRITE(((r1<r2) and (r2<=r3)) and not (3e10<r3));
 
 write("Performing INTEGER tests...");
 write((i1 mod i2 - 1 = 0) and ((i3+r1*r3/(r2+r1)-(i3+r1*r3/(r2+r1))) < 1e-10));
-write((1/2+3) = (1.0/2.0+3.0));
+write((1.0/2+3) = (1.0/2.0+3.0));
 write((-i1-i2-i3-i1-i2-i3-1 - (-i1-i2-i3-i1-i2-i3-1)) = 0);
 writE(----(---i3)=-1);
 write((-i1 = -1*i1) = (-i1 = -(1-1+i1)));
