@@ -1,12 +1,12 @@
 15
-abcdefghijklmnopqrstuvwxyz0'_:;<>=+-*/.()"e,{}~
+abcdefghijklmnopqrstuvwxyz0'_:;<>=+-*/.()"e,~
 
-# Na prvni radku MUSI byt uveden pocet automatu, na druhem MUSI byt abeceda
-# a oznacuje vsechny pismena, 0 vsechny cislice, ' bile znaky
+# Na prvni radku MUSI byt uveden pocet dilcich automatu, na druhem MUSI byt abeceda
+# 0 oznacuje vsechny cislice, ' bile znaky, ~ libovolny znak
 # N: nazev symbolu
 # Q: stavy, startovaci musi koncit na I, akceptujici na F
-# d: jednotlive prechody, nedefinovane prechody budou vytvoreny automaticky
-# Kdyz bude cas a chut, tak to hodim do xml :) Pro zajimavost - vysledny automat tohoto ma 20 stavu :)
+# d: nedefinovane prechody budou vytvoreny automaticky
+# Dalsi symboly - klicova slova jsou - uvedena v PJPLexicalAutomata.java
 
 # Relacni operatory
 N: relation
