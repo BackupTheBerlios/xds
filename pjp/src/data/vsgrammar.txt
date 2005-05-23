@@ -35,8 +35,9 @@ FUNC2      : ',' EXPR FUNC2;
 
 EXPR       : E E1;
 E          : H T1;
-H          : '-' H1
+H          : '-' H
            | H1
+           | 'not' H
            | 'stringval';
 H1         : 'numberint'
            | 'ident'
