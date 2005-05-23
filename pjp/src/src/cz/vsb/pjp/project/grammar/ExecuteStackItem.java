@@ -2,6 +2,11 @@ package cz.vsb.pjp.project.grammar;
 
 import cz.vsb.pjp.project.grammar.client.StackCodeProcessor;
 
+/**
+ * One item popped from execute stack
+ * 
+ * @author luk117
+ */
 public class ExecuteStackItem {
     public String data;
     public Comparable value;

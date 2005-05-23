@@ -1,8 +1,8 @@
 package cz.vsb.pjp.project.grammar;
 
 /**
- * Date: 28.4.2005
- * Time: 22:42:22
+ * Invalid grammar type (not LL(1) etc.)
+ * @author luk117
  */
 public class InvalidGrammarTypeException extends GrammarException {
     InvalidGrammarTypeException(String details) {

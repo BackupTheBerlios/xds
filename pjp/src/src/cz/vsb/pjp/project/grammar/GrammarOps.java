@@ -4,6 +4,7 @@ import java.util.*;
 
 /**
  * Implementace výpoètù nad gramatikou
+ * @author luk117
  */
 public class GrammarOps {
     /**

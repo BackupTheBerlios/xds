@@ -4,7 +4,9 @@ import java.util.Vector;
 import java.util.Stack;
 
 /**
-
+ * Derivation tree implementation (using generic in data)
+ *
+ * @author luk117
  */
 public class DerivationTree<T> {
     class Node {

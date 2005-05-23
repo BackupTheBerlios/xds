@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.io.IOException;
 
 /**
+ * Special stack automaton implementation
+ * @author luk117
  */
 public class StackAutomata {
     protected DecompositionTable table;

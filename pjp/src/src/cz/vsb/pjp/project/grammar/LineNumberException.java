@@ -1,8 +1,8 @@
 package cz.vsb.pjp.project.grammar;
 
 /**
- * Date: 29.4.2005
- * Time: 0:54:50
+ * Exception that carries line number
+ * @author luk117
  */
 public class LineNumberException extends Exception {
     /**

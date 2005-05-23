@@ -1,8 +1,8 @@
 package cz.vsb.pjp.project.grammar;
 
 /**
- * Date: 25.4.2005
- * Time: 14:07:51
+* Generic pair implementation
+ * @author luk117
  */
 public class Pair <T1 extends Comparable, T2 extends Comparable> implements Comparable {
     protected T1 first;
