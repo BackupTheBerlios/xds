@@ -4,7 +4,7 @@
 
     <target name="compile">
         <mkdir dir="${dest}"/>
-        <javac srcdir="src" destdir="${dest}" />
+        <javac srcdir="src" destdir="${dest}"  source="1.5" target="1.5" />
         <jar destfile="pjp.jar" basedir="${dest}">
         <manifest>
            <attribute name="Main-Class" value="cz/vsb/pjp/project/Main"/>
