@@ -68,7 +68,8 @@ public class IntegerValue extends Value {
      */
     public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
         if (v instanceof RealValue) {
-            return v.performOperation(operator, this);
+            RealValue r = new RealValue(this.getValue());
+            return r.performOperation(operator, v);
         }
 
         if (v instanceof IntegerValue) {
