@@ -29,17 +29,17 @@ public class StringValue extends Value {
         return value;
     }
 
-    public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Unary operator: " + operator + " isn't supported");
+    public Value performUnaryOperation(String operator) throws OperatorNotSupportedException {
+        throw new OperatorNotSupportedException("Unary operator: " + operator + " isn't supported");
     }
 
-    public void setValue(Value v) throws UnsupportedOperationException {
+    public void setValue(Value v) throws OperatorNotSupportedException {
         if (v instanceof StringValue) {
             this.value = ((StringValue) v).value;
         } else if (v instanceof FakeValue) {
             return;
         } else
-            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+            throw new OperatorNotSupportedException("Can't assign " + v.getType() + " to " + type);
     }
 
     /**
@@ -50,10 +50,7 @@ public class StringValue extends Value {
      * @return
      * @throws UnsupportedOperationException
      */
-    public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
-        if (v instanceof RealValue) {
-            return v.performOperation(operator, this);
-        }
+    public Value performOperation(String operator, Value v) throws OperatorNotSupportedException {
 
         if (v instanceof StringValue) {
             StringValue val = (StringValue) v;
@@ -74,10 +71,10 @@ public class StringValue extends Value {
             } else if (operator.equals("fake")) {
                 return this;
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with string type");
+                throw new OperatorNotSupportedException("Operator " + operator + " isn't supported with string type");
         } else if (v instanceof FakeValue)
             return this;
         else
-            throw new UnsupportedOperationException("Can't process string and " + v.getType());
+            throw new OperatorNotSupportedException("Can't process string and " + v.getType());
     }
 }

@@ -38,18 +38,18 @@ public class RealValue extends Value {
      *
      * @param operator
      * @return
-     * @throws UnsupportedOperationException
+     * @throws OperatorNotSupportedException
      */
-    public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
+    public Value performUnaryOperation(String operator) throws OperatorNotSupportedException {
         if (operator.equals("-")) {
             value = -value;
         } else
-            throw new UnsupportedOperationException("Unary operator: " + operator + " isn't supported");
+            throw new OperatorNotSupportedException("Unary operator: " + operator + " isn't supported");
 
         return new RealValue(value);
     }
 
-    public void setValue(Value v) throws UnsupportedOperationException {
+    public void setValue(Value v) throws OperatorNotSupportedException {
         if (v instanceof RealValue) {
             this.value = ((RealValue) v).value;
         } else if (v instanceof IntegerValue) {
@@ -57,7 +57,7 @@ public class RealValue extends Value {
         } else if (v instanceof FakeValue) {
             return;
         } else
-            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+            throw new OperatorNotSupportedException("Can't assign " + v.getType() + " to " + type);
     }
 
 
@@ -67,9 +67,9 @@ public class RealValue extends Value {
      * @param operator
      * @param v        jen Integer
      * @return
-     * @throws UnsupportedOperationException
+     * @throws OperatorNotSupportedException
      */
-    public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
+    public Value performOperation(String operator, Value v) throws OperatorNotSupportedException {
         if (v instanceof IntegerValue) {
             v = new RealValue(((IntegerValue) v).getRealValue());
         }
@@ -99,10 +99,10 @@ public class RealValue extends Value {
             } else if (operator.equals("fake")) {
                 return this;
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with real type");
+                throw new OperatorNotSupportedException("Operator " + operator + " isn't supported with real type");
         } else if (v instanceof FakeValue)
             return this;
         else
-            throw new UnsupportedOperationException("Can't process real and " + v.getType());
+            throw new OperatorNotSupportedException("Can't process real and " + v.getType());
     }
 }

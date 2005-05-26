@@ -1,10 +1,5 @@
 package cz.vsb.pjp.project.recursivegrammar;
 
-import cz.vsb.pjp.project.recursivegrammar.StringValue;
-import cz.vsb.pjp.project.recursivegrammar.RealValue;
-import cz.vsb.pjp.project.recursivegrammar.IntegerValue;
-import cz.vsb.pjp.project.recursivegrammar.BooleanValue;
-
 /**
  * Abstraktni trida pro hodnoty ukladane do tabulky symbolu.
  * Ukolem tridy je resit typovodou kontrolu jednotlivych promennych, provadet operace na promennych, eventuelne automaticke konverze.
@@ -34,7 +29,7 @@ public abstract class Value {
      * @return vypoctena hodnota
      * @throws UnsupportedOperationException pokud operace neni definovana
      */
-    public abstract Value performOperation(String operator, Value v) throws UnsupportedOperationException;
+    public abstract Value performOperation(String operator, Value v) throws OperatorNotSupportedException;
 
     /**
      * Na objektu provede unarni operaci
@@ -43,7 +38,7 @@ public abstract class Value {
      * @return vraci vypoctenou hodnotu
      * @throws UnsupportedOperationException pokud operand neni definovan
      */
-    public abstract Value performUnaryOperation(String operator) throws UnsupportedOperationException;
+    public abstract Value performUnaryOperation(String operator) throws OperatorNotSupportedException;
 
     /**
      * Retezec se pokusit prevest na adekvatni hodnotu a nastavit ji
@@ -58,7 +53,7 @@ public abstract class Value {
      * @param v
      * @throws UnsupportedOperationException Pokud neni mozne hodntou nastavit (chybny typ)
      */
-    public abstract void setValue(Value v) throws UnsupportedOperationException;
+    public abstract void setValue(Value v) throws OperatorNotSupportedException;
 
     /**
      * Vraci vychozi hodnotu pro dany typ. Definovany jsou: Integer, Real, Boolean, String
@@ -67,7 +62,7 @@ public abstract class Value {
      * @return Vraci vychozi hodnotu
      * @throws UnsupportedOperationException pokud neni typ definovan
      */
-    public static Value getDefaultValue(String type) throws UnsupportedOperationException {
+    public static Value getDefaultValue(String type) throws OperatorNotSupportedException {
         if (type.equals("integer"))
             return new IntegerValue(0);
         else if (type.equals("real"))
@@ -79,7 +74,7 @@ public abstract class Value {
         else if (type.equals("fake"))
             return new FakeValue();
         else
-            throw new UnsupportedOperationException("Unsupported data type");
+            throw new OperatorNotSupportedException("Unsupported data type");
     }
 
     public String toString() {

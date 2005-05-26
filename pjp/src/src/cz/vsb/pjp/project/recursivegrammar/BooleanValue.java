@@ -38,22 +38,22 @@ public class BooleanValue extends Value {
      *
      * @param operator
      * @return
-     * @throws UnsupportedOperationException
+     * @throws OperatorNotSupportedException
      */
-    public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
+    public Value performUnaryOperation(String operator) throws OperatorNotSupportedException {
         if (operator.equals("not")) {
             return new BooleanValue(!value);
         }
-        throw new UnsupportedOperationException("Unary operator: " + operator + " isn't supported");
+        throw new OperatorNotSupportedException("Unary operator: " + operator + " isn't supported");
     }
 
-    public void setValue(Value v) throws UnsupportedOperationException {
+    public void setValue(Value v) throws OperatorNotSupportedException {
         if (v instanceof BooleanValue) {
             this.value = ((BooleanValue) v).value;
         } else if (v instanceof FakeValue) {
             return;
         } else
-            throw new UnsupportedOperationException("Can't assign " + v.getType() + " to " + type);
+            throw new OperatorNotSupportedException("Can't assign " + v.getType() + " to " + type);
     }
 
     /**
@@ -62,9 +62,9 @@ public class BooleanValue extends Value {
      * @param operator
      * @param v        jen Integer
      * @return
-     * @throws UnsupportedOperationException
+     * @throws OperatorNotSupportedException
      */
-    public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
+    public Value performOperation(String operator, Value v) throws OperatorNotSupportedException {
         if (v instanceof BooleanValue) {
             BooleanValue val = (BooleanValue) v;
             if (operator.equals("and")) {
@@ -102,10 +102,10 @@ public class BooleanValue extends Value {
                 else
                     return new BooleanValue(false);
             } else
-                throw new UnsupportedOperationException("Operator " + operator + " isn't supported with bool type");
+                throw new OperatorNotSupportedException("Operator " + operator + " isn't supported with bool type");
         } else if (v instanceof FakeValue)
             return this;
         else
-            throw new UnsupportedOperationException("Can't process bool and " + v.getType());
+            throw new OperatorNotSupportedException("Can't process bool and " + v.getType());
     }
 }

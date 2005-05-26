@@ -23,15 +23,15 @@ public abstract class Function extends Value {
         return null;
     }
 
-    public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Functions can't be used with operators");
+    public Value performOperation(String operator, Value v) throws OperatorNotSupportedException {
+        throw new OperatorNotSupportedException("Functions can't be used with operators");
     }
 
-    public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Function can't be used with operators");
+    public Value performUnaryOperation(String operator) throws OperatorNotSupportedException {
+        throw new OperatorNotSupportedException("Function can't be used with operators");
     }
 
-    public void setValue(Value v) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Can't set value to function");
+    public void setValue(Value v) throws OperatorNotSupportedException {
+        throw new OperatorNotSupportedException("Can't set value to function");
     }
 }

@@ -14,11 +14,11 @@ public class FakeValue extends Value {
         return "fake";
     }
 
-    public Value performOperation(String operator, Value v) throws UnsupportedOperationException {
+    public Value performOperation(String operator, Value v) throws OperatorNotSupportedException {
         return this;
     }
 
-    public Value performUnaryOperation(String operator) throws UnsupportedOperationException {
+    public Value performUnaryOperation(String operator) throws OperatorNotSupportedException {
         return this;
     }
 
@@ -26,7 +26,7 @@ public class FakeValue extends Value {
         return;
     }
 
-    public void setValue(Value v) throws UnsupportedOperationException {
+    public void setValue(Value v) throws OperatorNotSupportedException {
         return;
     }
 }
