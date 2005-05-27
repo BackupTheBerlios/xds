@@ -113,7 +113,7 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
                     if (varObj.sameTypeAs(source))
                         varObj.value = source.value;
                     else if (varObj.type == Variable.TYPE_REAL && p.type == Variable.TYPE_INTEGER) {
-                        // automatical conversion int->double
+                        // automatic conversion int->double
                         varObj.value = new Double(((Integer)p.value).intValue());
                     } else
                         runtimeError("Identifiers " + varObj + " and " + p + " don't have compatible types", false);
@@ -201,6 +201,13 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
                     return;
                 }
             } else if (function.value.equals("/")) {
+                // WASBUG: Division by zero was allowed!
+                if (a.type == CONST_INTEGER && ((Double)a.value).doubleValue() == 0) {
+                    runtimeError("Integral division by zero is not allowed", false);
+                    pool.push(new ExecuteStackItem(CONST_INTEGER, null, new Double(0.0)));
+                    return;
+                }
+
                 if (expectType(a, b, CONST_DOUBLE, CONST_INTEGER)) {
                     pool.push(new ExecuteStackItem(getResultType(a.type, b.type), null,
                         new Double(((Double)b.value).doubleValue() / ((Double)a.value).doubleValue())));
@@ -256,6 +263,9 @@ public class StackCodeProcessor extends ClientStackCodeProcessor{
                 return;
             } else if (function.value.equals("=")) {
                 pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) == 0)));
+                return;
+            } else if (function.value.equals("<>")) {
+                pool.push(new ExecuteStackItem(CONST_BOOL, null, new Boolean(b.compareTo(a) != 0)));
                 return;
             } else {
                 runtimeError("Unknown binary operation: " + function, false);

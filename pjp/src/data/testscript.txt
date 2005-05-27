@@ -5,7 +5,7 @@
 write("Welcome to test script");
 write("~~~~~~~~~~~~~~~~~~~~~~");
 write("There should be neither Runtime error nor FALSE test result reported.");
-write("~~~~~~~~~~~~~~~~~~~~~~");
+write("");
 
 // ------ declare some stuff
 var br:boolean;
@@ -20,9 +20,9 @@ r1:=2e-81; r2:=3.14159; r3:=3.5e5;
 i1:=10; i2:=3; i3:=1;
 
 write("Performing BOOLEAN tests...");
-write(false<(false<=(false>true))=true);
+write(false<(false<=(false>true))=true<>false);
 write(not not not (a>b) <= (a.b>=a));
-write(false<false>=false);
+write(false<false>=false<>true and false);
 
 write("Performing REAL tests...");
 WRITE(((r1<r2) and (r2<=r3)) and not (3e10<r3));
@@ -33,6 +33,9 @@ write((1.0/2+3) = (1.0/2.0+3.0));
 write((-i1-i2-i3-i1-i2-i3-1 - (-i1-i2-i3-i1-i2-i3-1)) = 0);
 writE(----(---i3)=-1);
 write((-i1 = -1*i1) = (-i1 = -(1-1+i1)));
+
+// these should fail
+write("division by zero: INT-", 1/0, " REAL-", 1/0.0);
 
 write("Performing STRING tests...");
 write((a.(b."+").c="AB+CCCC") or not (a.b<a.b));
