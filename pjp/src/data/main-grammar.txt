@@ -5,7 +5,7 @@
 Note: it's not legal to simply edit grammar! Its semantics is hidden in client package.
 }
 
-STATEMENT  : EXPRESSION ';' ;
+STATEMENT  : EXPRESSION 'semicolon' ;
 
 EXPRESSION : ID_FIRST
            | DECLARATION
@@ -35,31 +35,31 @@ T1'        :  'arithmeticala' OPERAND T1'
            |  'and' OPERAND T1'
            |  {e} ;
 
-OPERAND    : '(' AFORMULA ')'
+OPERAND    : 'leftp' AFORMULA 'rightp'
            | 'numberint'
            | 'numberdouble'
            | 'stringval'
            | 'ident'
            | 'not' OPERAND
-           | 'arithmeticalb@unary-' OPERAND  { mapping used here! }
+           | 'arithmeticalb@unary-' OPERAND  { note: mapping used here }
            | BOOL_CONST ;
 
 BOOL_CONST : 'true'
            | 'false' ;
 
-DECLARATION : 'var' DA ':' VARTYPE          [ 0 3 2 1 ];
+DECLARATION : 'var' DA 'colon' VARTYPE          [ 0 3 2 1 ];
 
 VARTYPE    : 'type' ;
 
 DA         : 'ident' DA' ;
 
-DA'        : ',' DA
+DA'        : 'comma' DA
            | {e};
 
-FUNCTION_CALL : '(' ARGS ')' ;
+FUNCTION_CALL : 'leftp' ARGS 'rightp' ;
 
 ARGS       : AFORMULA ARG'
            | {e} ;  { function w/o arguments support }
 
 ARG'       : {e}
-           | ',' ARGS  [ 0 1 ];
+           | 'comma' ARGS  [ 0 1 ];

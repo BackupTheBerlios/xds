@@ -35,7 +35,7 @@ writE(----(---i3)=-1);
 write((-i1 = -1*i1) = (-i1 = -(1-1+i1)));
 
 // these should fail
-write("division by zero: INT-", 1/0, " REAL-", 1/0.0);
+//write("division by zero: INT-", 1/0, " REAL-", 1/0.0);
 
 write("Performing STRING tests...");
 write((a.(b."+").c="AB+CCCC") or not (a.b<a.b));
