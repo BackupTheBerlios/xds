@@ -25,11 +25,23 @@ public class Grammar {
         return new StringBuilder(" at line ").append(line).append(", position ").append(word).toString();
     }
 
+    protected void handleErrorToken() throws AutomatException, NoMoreTokensException, IOException {
+        if (s.getName().equals("error")) {
+            errorOccured = true;
+            s = l.getToken();
+            while (s.getName().equals("error")) {
+                s = l.getToken();
+            }
+        }
+    }
+
     public Grammar(LexicalAutomata l) throws AutomatException, IOException, NoMoreTokensException {
         this.l = l;
         s = l.getToken();
         line = s.getLine();
         word = s.getPos();
+        handleErrorToken();
+
         symbolTable.put("write", new Function() {
             public Object ExecuteFunction(AbstractList<Value> values) {
                 int size = values.size();
@@ -65,14 +77,7 @@ public class Grammar {
                 s = l.getToken();
                 line = s.getLine();
                 word = s.getPos();
-
-                if (s.getName().equals("error")) {
-                    errorOccured = true;
-                    s = l.getToken();
-                    while (s.getName().equals("error")) {
-                        s = l.getToken();
-                    }
-                }
+                handleErrorToken();
             } else {
                 System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
                 errorOccured = true;
@@ -86,6 +91,7 @@ public class Grammar {
     }
 
     public void synchro(HashSet<String> context) throws IOException, AutomatException {
+        errorOccured = true;
         try {
             while (!context.contains(s.getName())) {
                 s = l.getToken();
@@ -101,7 +107,6 @@ public class Grammar {
 
         if (!(s.getName().equals("ident") || s.getName().equals("var") || s.getName().equals("semicolon"))) {
             System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected ident, var or semicolon");
-            errorOccured = true;
             synchro(context);
 
         }
@@ -149,7 +154,6 @@ public class Grammar {
     public String D(HashSet<String> context) throws AutomatException, IOException {
         if (!(s.getName().equals("comma") || s.getName().equals("colon"))) {
             System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected comma or colon");
-            errorOccured = true;
             synchro(context);
         }
 
@@ -175,7 +179,6 @@ public class Grammar {
     public void B(String name, HashSet<String> context) throws AutomatException, IOException {
         if (!(s.getName().equals("leftp") || s.getName().equals("assign"))) {
             System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected ( or :=");
-            errorOccured = true;
             synchro(context);
         }
         Symbol tmp = s;
@@ -408,7 +411,6 @@ public class Grammar {
         context.add("numberdouble");
         if (!(s.getName().equals("leftp") || s.getName().equals("ident") || s.getName().equals("true") || s.getName().equals("false") || s.getName().equals("numberint") || s.getName().equals("numberdouble"))) {
             System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected (, ident, true, false or number");
-            errorOccured = true;
             synchro(context);
         }
         context.remove("leftp");
