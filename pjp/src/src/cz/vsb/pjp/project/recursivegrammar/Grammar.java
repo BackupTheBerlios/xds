@@ -281,11 +281,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = E2(in, next);
@@ -305,11 +305,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
@@ -322,11 +322,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
@@ -339,11 +339,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = G(in, next);
@@ -373,11 +373,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = T1(in, next);
@@ -390,11 +390,11 @@ public class Grammar {
             } catch (OperatorNotSupportedException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             } catch (ArithmeticException e) {
                 System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
-                return new FakeValue();
+                in = new FakeValue();
             }
             next = (HashSet<String>) context.clone();
             in = T1(in, next);
