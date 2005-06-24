@@ -65,6 +65,14 @@ public class Grammar {
                 s = l.getToken();
                 line = s.getLine();
                 word = s.getPos();
+
+                if (s.getName().equals("error")) {
+                    errorOccured = true;
+                    s = l.getToken();
+                    while (s.getName().equals("error")) {
+                        s = l.getToken();
+                    }
+                }
             } else {
                 System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
                 errorOccured = true;

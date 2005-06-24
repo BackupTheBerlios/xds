@@ -62,6 +62,7 @@ public class LexicalAutomata {
 
     /**
      * Vraci nasledujici symbol
+     *
      * @return
      * @throws IOException
      * @throws AutomatException
@@ -170,9 +171,12 @@ public class LexicalAutomata {
                         fronta.add(s);
                         found = false;
                     } else {
-                        System.err.println("Lex: syntax error: char " + act + " at line " + line + ", char " + word);
-
                         clearBuffer();
+                        System.err.println("Lex: syntax error: char " + act + " at line " + line + ", char " + word);
+                        Symbol s = new Symbol("error");
+                        s.setLine(line);
+                        s.setPos(word);
+                        fronta.add(s);
                     }
                 }
             }
@@ -182,8 +186,12 @@ public class LexicalAutomata {
                 s.setPos(word - s.getAtt().length());
                 fronta.add(s);
             } else if (tmp.length() > 0) {
-                System.err.println("Lex: syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
                 clearBuffer();
+                System.err.println("Lex: syntax error: char " + tmp.charAt(tmp.length() - 1) + " at line " + line + ", char " + word);
+                Symbol s = new Symbol("error");
+                s.setLine(line);
+                s.setPos(word);
+                fronta.add(s);
             }
 
             tmp.delete(0, tmp.length());
