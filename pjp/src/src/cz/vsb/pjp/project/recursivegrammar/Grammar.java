@@ -65,8 +65,7 @@ public class Grammar {
                 s = l.getToken();
                 line = s.getLine();
                 word = s.getPos();
-            }
-            else {
+            } else {
                 System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected " + sym);
                 errorOccured = true;
                 // Synchronizace
@@ -78,9 +77,7 @@ public class Grammar {
         }
     }
 
-    public void synchro(HashSet<String> context) throws IOException, GrammarException, AutomatException {
-        System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition());
-        errorOccured = true;
+    public void synchro(HashSet<String> context) throws IOException, AutomatException {
         try {
             while (!context.contains(s.getName())) {
                 s = l.getToken();
@@ -91,10 +88,15 @@ public class Grammar {
         }
     }
 
-    public void Statement(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public void Statement(HashSet<String> context) throws AutomatException, IOException {
         if (s.getName().equals(LexicalAutomata.EOF)) return;
 
-        if (!(s.getName().equals("ident") || s.getName().equals("var") || s.getName().equals("semicolon"))) synchro(context);
+        if (!(s.getName().equals("ident") || s.getName().equals("var") || s.getName().equals("semicolon"))) {
+            System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected ident, var or semicolon");
+            errorOccured = true;
+            synchro(context);
+
+        }
 
         if (s.getName().equals("ident")) {
             String name = s.getAtt();
@@ -114,7 +116,7 @@ public class Grammar {
         Statement(context);
     }
 
-    public String Declaration(HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public String Declaration(HashSet<String> context) throws AutomatException, IOException {
         Symbol tmp = s;
         expect("ident", context);
         HashSet<String> next = (HashSet<String>) context.clone();
@@ -126,17 +128,22 @@ public class Grammar {
             type = "fake";
         } else {
             try {
-            symbolTable.put(tmp.getAtt().toLowerCase(), Value.getDefaultValue(type));
+                symbolTable.put(tmp.getAtt().toLowerCase(), Value.getDefaultValue(type));
             } catch (OperatorNotSupportedException e) {
-                  System.err.println("Error: type "+type+" is not supported");
-                  errorOccured = true;
-                  type = "fake";                                }
+                System.err.println("Error: type " + type + " is not supported");
+                errorOccured = true;
+                type = "fake";
+            }
         }
         return type;
     }
 
-    public String D(HashSet<String> context) throws AutomatException, GrammarException, IOException {
-        if (!(s.getName().equals("comma") || s.getName().equals("colon"))) synchro(context);
+    public String D(HashSet<String> context) throws AutomatException, IOException {
+        if (!(s.getName().equals("comma") || s.getName().equals("colon"))) {
+            System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected comma or colon");
+            errorOccured = true;
+            synchro(context);
+        }
 
         if (s.getAtt().equals(",")) {
             expect(",", context);
@@ -152,12 +159,17 @@ public class Grammar {
             }
             return type;
         } else {
-            throw new GrammarException("Error in grammar");
+            //throw new GrammarException("Error in grammar");
+            return "fake";
         }
     }
 
-    public void B(String name, HashSet<String> context) throws AutomatException, IOException, GrammarException {
-        if (!(s.getName().equals("leftp") || s.getName().equals("assign"))) synchro(context);
+    public void B(String name, HashSet<String> context) throws AutomatException, IOException {
+        if (!(s.getName().equals("leftp") || s.getName().equals("assign"))) {
+            System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected ( or :=");
+            errorOccured = true;
+            synchro(context);
+        }
         Symbol tmp = s;
         if (tmp.getAtt().equals(":=")) {
             expect(":=", context);
@@ -177,7 +189,7 @@ public class Grammar {
         }
     }
 
-    public void Func(Function f, HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public void Func(Function f, HashSet<String> context) throws AutomatException, IOException {
         LinkedList<Value> ll = new LinkedList<Value>();
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("comma");
@@ -186,7 +198,7 @@ public class Grammar {
         f.ExecuteFunction(ll);
     }
 
-    public AbstractList<Value> Func2(AbstractList<Value> ll, HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public AbstractList<Value> Func2(AbstractList<Value> ll, HashSet<String> context) throws AutomatException, IOException {
         if (s.getAtt().equals(",")) {
             expect(",", context);
             HashSet<String> next = (HashSet<String>) context.clone();
@@ -197,7 +209,7 @@ public class Grammar {
         return ll;
     }
 
-    public void Assign(String prom, HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public void Assign(String prom, HashSet<String> context) throws AutomatException, IOException {
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("comma");
         Value value = Expr(next);
@@ -207,19 +219,19 @@ public class Grammar {
         old = symbolTable.get(prom);
         if (old != null) {
             try {
-            old.setValue(value);
+                old.setValue(value);
             } catch (OperatorNotSupportedException e) {
                 errorOccured = true;
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
             }
 
         } else {
-           System.err.println("Error: variable " + prom + " is not defined");
-           errorOccured = true;
+            System.err.println("Error: variable " + prom + " is not defined");
+            errorOccured = true;
         }
     }
 
-    public Value Expr(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public Value Expr(HashSet<String> context) throws AutomatException, IOException {
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("arithmeticalb");
         next.add("concat");
@@ -233,7 +245,7 @@ public class Grammar {
         return data;
     }
 
-    public Value E1(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public Value E1(Value in, HashSet<String> context) throws AutomatException, IOException {
         if (s.getName().equals("arithmeticalb") || s.getName().equals("concat") || s.getAtt().equals("or") || s.getName().equals("relation")) {
             HashSet<String> next = (HashSet<String>) context.clone();
             in = G(in, next);
@@ -244,7 +256,7 @@ public class Grammar {
         return in;
     }
 
-    public Value E2(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public Value E2(Value in, HashSet<String> context) throws AutomatException, IOException {
         Symbol tmp = s;
         if (s.getName().equals("relation")) {
             expect("relation", context);
@@ -256,11 +268,11 @@ public class Grammar {
             try {
                 in = in.performOperation(tmp.getAtt(), value);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -271,20 +283,20 @@ public class Grammar {
         return in;
     }
 
-    public Value G(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public Value G(Value in, HashSet<String> context) throws AutomatException, IOException {
         String oper = s.getAtt();
         if (s.getName().equals("arithmeticalb")) {
             expect("arithmeticalb", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
             try {
-            in = in.performOperation(oper, value);
+                in = in.performOperation(oper, value);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -295,13 +307,13 @@ public class Grammar {
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
             try {
-            in = in.performOperation(oper, value);
+                in = in.performOperation(oper, value);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -312,13 +324,13 @@ public class Grammar {
             HashSet<String> next = (HashSet<String>) context.clone();
             Value value = E(next);
             try {
-            in = in.performOperation(oper, value);
+                in = in.performOperation(oper, value);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -329,7 +341,7 @@ public class Grammar {
         return in;
     }
 
-    public Value E(HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public Value E(HashSet<String> context) throws AutomatException, IOException {
         HashSet<String> next = (HashSet<String>) context.clone();
         next.add("arithmeticala");
         next.add("and");
@@ -339,20 +351,20 @@ public class Grammar {
         return value;
     }
 
-    public Value T1(Value in, HashSet<String> context) throws AutomatException, GrammarException, IOException {
+    public Value T1(Value in, HashSet<String> context) throws AutomatException, IOException {
         Symbol tmp = s;
         if (tmp.getName().equals("arithmeticala")) {
             expect("arithmeticala", context);
             HashSet<String> next = (HashSet<String>) context.clone();
             Value valueB = H(next);
             try {
-            in = in.performOperation(tmp.getAtt(), valueB);
+                in = in.performOperation(tmp.getAtt(), valueB);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -365,11 +377,11 @@ public class Grammar {
             try {
                 in = in.performOperation(tmp.getAtt(), valueB);
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             } catch (ArithmeticException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -379,14 +391,18 @@ public class Grammar {
         return in;
     }
 
-    public Value H1(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public Value H1(HashSet<String> context) throws AutomatException, IOException {
         context.add("leftp");
         context.add("ident");
         context.add("true");
         context.add("false");
         context.add("numberint");
         context.add("numberdouble");
-        if (!(s.getName().equals("leftp") || s.getName().equals("ident") || s.getName().equals("true") || s.getName().equals("false") || s.getName().equals("numberint") || s.getName().equals("numberdouble"))) synchro(context);
+        if (!(s.getName().equals("leftp") || s.getName().equals("ident") || s.getName().equals("true") || s.getName().equals("false") || s.getName().equals("numberint") || s.getName().equals("numberdouble"))) {
+            System.err.println("Syntax Error at line: " + l.getLine() + ", position: " + l.getPosition() + ", expected (, ident, true, false or number");
+            errorOccured = true;
+            synchro(context);
+        }
         context.remove("leftp");
         context.remove("ident");
         context.remove("true");
@@ -431,7 +447,7 @@ public class Grammar {
         }
     }
 
-    public Value H(HashSet<String> context) throws AutomatException, IOException, GrammarException {
+    public Value H(HashSet<String> context) throws AutomatException, IOException {
         Symbol tmp = s;
         if (tmp.getAtt().equals("-")) {
             expect("-", context);
@@ -439,7 +455,7 @@ public class Grammar {
             try {
                 return H(next).performUnaryOperation("-");
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
@@ -449,7 +465,7 @@ public class Grammar {
             try {
                 return H(next).performUnaryOperation("not");
             } catch (OperatorNotSupportedException e) {
-                System.err.println("Error: "+e.getMessage() + getPos());
+                System.err.println("Error: " + e.getMessage() + getPos());
                 errorOccured = true;
                 return new FakeValue();
             }
